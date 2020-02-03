@@ -1,0 +1,19 @@
+{
+  "name": "gist_cli",
+  "author": "Christopher Wales",
+  "scripts": {
+    "start": "src/Cli.js"
+  },
+  "dependencies": {
+    "axios": "^0.19.2",
+    "yargonaut": "^1.1.4",
+    "yargs": "^15.1.0",
+    "process": "latest"
+  },
+  "bin": {
+    "githero": "src/Cli.js"
+  },
+  "devDependencies": {
+    "jsdoc": "^3.6.3"
+  }
+}
