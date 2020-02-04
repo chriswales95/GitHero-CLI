@@ -8,7 +8,7 @@ module.exports = class Git {
             query: "query {\n" +
                 "  viewer {\n" +
                 "    resourcePath\n" +
-                `    gists(first: ${numberOfGists}) {\n` +
+                `    gists(first: ${numberOfGists}, privacy: ALL) {\n` +
                 "    totalCount\n" +
                 "      nodes {\n" +
                 "        description\n" +
