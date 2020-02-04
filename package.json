@@ -1,6 +1,7 @@
 {
   "name": "gist_cli",
   "author": "Christopher Wales",
+  "version": "1.0.0",
   "scripts": {
     "start": "src/Cli.js"
   },
