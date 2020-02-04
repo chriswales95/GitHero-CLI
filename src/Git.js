@@ -1,34 +1,58 @@
 module.exports = class Git {
 
     async getGists(numberOfGists, token) {
+        if (!token) {
+            throw new Error("token not set");
+        }
         let response = await require('axios').default.post("https://api.github.com/graphql", {
-            query: "query { \n" +
-                "  viewer { \n" +
-                "    gists(privacy:ALL, first:" + numberOfGists + "){\n" +
-                "     totalCount \n" +
-                "      edges {\n" +
-                "        node{\n" +
-                "          name\n" +
-                "          id\n" +
-                "          createdAt\n" +
-                "          description\n" +
-                "          isFork\n" +
-                "          isPublic\n" +
-                "          __typename\n" +
-                "          files{\n" +
-                "            encodedName\n" +
-                "            extension\n" +
-                "            size\n" +
-                "          }\n" +
-                "        }\n" +
+            query: "query {\n" +
+                "  viewer {\n" +
+                "    resourcePath\n" +
+                `    gists(first: ${numberOfGists}) {\n` +
+                "    totalCount\n" +
+                "      nodes {\n" +
+                "        description\n" +
+                "        url\n" +
+                "        isPublic\n" +
+                "        isFork\n" +
+                "        resourcePath\n" +
                 "      }\n" +
                 "    }\n" +
                 "  }\n" +
-                "}"
+                "}\n"
         }, {headers: {Authorization: "Bearer " + token}});
 
-        return response.data.data.viewer.gists.edges.map(gist => {
-            return gist.node;
+        return response.data.data.viewer.gists.nodes.map(gist => {
+            return gist;
+        });
+    }
+
+    async getRepos(numberOfGists, token) {
+        if (!token) {
+            throw new Error("token not set");
+        }
+        let response = await require('axios').default.post("https://api.github.com/graphql", {
+            query: "query {\n" +
+                "  viewer {\n" +
+                "    resourcePath\n" +
+                `    repositories(first: ${numberOfGists}) {\n` +
+                "      totalCount\n" +
+                "      nodes {\n" +
+                "        name\n" +
+                "        isFork\n" +
+                "        url\n" +
+                "        sshUrl\n" +
+                "        updatedAt\n" +
+                "      }\n" +
+                "    }\n" +
+                "  }\n" +
+                "}\n"
+        }, {headers: {Authorization: "Bearer " + token}});
+
+        return response.data.data.viewer.repositories.nodes.map(repo => {
+            let date = new Date(repo.updatedAt);
+            repo.updatedAt = `${date.toLocaleDateString()} ${date.toTimeString()}`;
+            return repo;
         });
     }
 

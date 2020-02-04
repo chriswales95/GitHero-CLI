@@ -74,4 +74,8 @@ module.exports = class Bootstrap {
     get config() {
         return this._config;
     }
+
+    get args() {
+        return this._args;
+    }
 };
