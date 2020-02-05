@@ -1,8 +1,10 @@
 {
   "name": "gist_cli",
   "author": "Christopher Wales",
+  "version": "1.0.0-beta-1",
   "scripts": {
-    "start": "src/Cli.js"
+    "start": "src/Cli.js",
+    "test": "jest"
   },
   "dependencies": {
     "axios": "^0.19.2",
@@ -14,6 +16,7 @@
     "githero": "src/Cli.js"
   },
   "devDependencies": {
+    "jest": "^25.1.0",
     "jsdoc": "^3.6.3"
   }
 }
