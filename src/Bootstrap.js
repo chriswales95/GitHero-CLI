@@ -9,11 +9,12 @@ const fs = require('fs');
 /**
  * @class Bootstrap
  */
-module.exports = class Bootstrap {
+class Bootstrap {
 
     /**
      * Constructor menu
-     * @param args
+     * @constructor
+     * @param {object} args
      */
     constructor(args) {
         this._os = os.platform();
@@ -23,7 +24,9 @@ module.exports = class Bootstrap {
     }
 
     /**
-     * Initialise the app
+     * Init the app
+     *
+     * @returns {Bootstrap}
      */
     init() {
 
@@ -51,6 +54,11 @@ module.exports = class Bootstrap {
         return this;
     }
 
+    /**
+     * Check arguments for config
+     *
+     * @param args
+     */
     checkArgs(args) {
         let updateConfig = false;
         if (args._.includes('config') && (this._args.token || this._args.t)) {
@@ -62,6 +70,11 @@ module.exports = class Bootstrap {
         }
     }
 
+    /**
+     * Store configuration
+     *
+     * @param config
+     */
     storeConfig(config) {
         fs.writeFile(`${os.homedir()}/.githero.json`, JSON.stringify(config), function (err) {
             if (err) {
@@ -71,11 +84,23 @@ module.exports = class Bootstrap {
         });
     }
 
+    /**
+     * Get config
+     *
+     * @returns {{}}
+     */
     get config() {
         return this._config;
     }
 
+    /**
+     * Get args
+     *
+     * @returns {Object}
+     */
     get args() {
         return this._args;
     }
-};
+}
+
+module.exports = Bootstrap;
