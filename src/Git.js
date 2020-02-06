@@ -1,5 +1,15 @@
-module.exports = class Git {
+/**
+ * @class Git
+ */
+class Git {
 
+    /**
+     * Get Gists
+     *
+     * @param numberOfGists
+     * @param token
+     * @returns {Promise<T[]>}
+     */
     async getGists(numberOfGists, token) {
         if (!token) {
             throw new Error("token not set");
@@ -27,6 +37,13 @@ module.exports = class Git {
         });
     }
 
+    /**
+     * Get repos
+     *
+     * @param numberOfGists
+     * @param token
+     * @returns {Promise<T[]>}
+     */
     async getRepos(numberOfGists, token) {
         if (!token) {
             throw new Error("token not set");
@@ -56,4 +73,6 @@ module.exports = class Git {
         });
     }
 
-};
+}
+
+module.exports = Git;

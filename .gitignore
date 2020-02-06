@@ -1,3 +1,6 @@
+# Ignore JSdoc for now
+out
+
 # Logs
 .idea
 logs
