@@ -24,14 +24,10 @@ let argv = yargs
         function (yargs) {
             return [
                 yargs.option('token', {
-                        alias: 't',
-                        describe: 'Store your api key for ease of use',
-                        type: 'string'
-                    }, yargs.option('email', {
-                        describe: 'Configure your  email address associated with your GitHub account',
-                        type: 'string'
-                    })
-                )]
+                    alias: 't',
+                    describe: 'Store your api key for ease of use',
+                    type: 'string'
+                })]
         })
     .command('repos [num]', 'get a list of your repositories')
     .command('gists [num]', 'get a list of your gists')
