@@ -82,7 +82,7 @@ class Git {
      * @param repo
      * @param numberOfIssues
      * @param token
-     * @returns {Promise<ProfileNode[]|[]>}
+     * @returns {Promise<T[]>}
      */
     async getIssuesFromRepo(owner, repo, numberOfIssues, token) {
         if (!token) {
