@@ -8,9 +8,10 @@
   },
   "dependencies": {
     "axios": "^0.19.2",
+    "process": "latest",
+    "table": "^5.4.6",
     "yargonaut": "^1.1.4",
-    "yargs": "^15.1.0",
-    "process": "latest"
+    "yargs": "^15.1.0"
   },
   "bin": {
     "githero": "src/Cli.js"
