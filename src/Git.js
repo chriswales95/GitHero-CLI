@@ -113,10 +113,6 @@ class Git {
                 "}"
         }, {headers: {Authorization: "Bearer " + token}});
 
-        if (response.data.errors[0].message) {
-            throw new Error(response.data.errors[0].message);
-        }
-
         if (typeof response !== 'undefined') {
             return response.data.data.repository.issues.nodes;
         } else {
