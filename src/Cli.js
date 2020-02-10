@@ -84,7 +84,6 @@ let app = new bootstrap(argv).init();
             break;
 
         case "prs":
-            console.log(app.args);
             git.getPullRequests(app.args.account, app.args.repository, app.args.num ? app.args.num : 10)
                 .then(res => {
                     console.table(res);
