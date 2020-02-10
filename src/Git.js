@@ -125,7 +125,7 @@ class Git {
      * @param owner
      * @param repo
      * @param numberOfPrs
-     * @returns {Promise<ProfileNode[]|[]>}
+     * @returns {Promise<T[]>}
      */
     async getPullRequests(owner, repo, numberOfPrs) {
 
