@@ -6,16 +6,22 @@
 class Git {
 
     /**
+     * Constructor
+     *
+     * @param token
+     */
+    constructor(token) {
+        this.token = token
+    }
+
+    /**
      * Get Gists
      *
      * @param numberOfGists
-     * @param token
      * @returns {Promise<T[]>}
      */
-    async getGists(numberOfGists, token) {
-        if (!token) {
-            throw new Error("token not set");
-        }
+    async getGists(numberOfGists) {
+
         let response = await require('axios').default.post("https://api.github.com/graphql", {
             query: "query {\n" +
                 "  viewer {\n" +
@@ -32,7 +38,7 @@ class Git {
                 "    }\n" +
                 "  }\n" +
                 "}\n"
-        }, {headers: {Authorization: "Bearer " + token}});
+        }, {headers: {Authorization: "Bearer " + this.token}});
 
         return response.data.data.viewer.gists.nodes.map(gist => {
             return gist;
@@ -43,13 +49,10 @@ class Git {
      * Get repos
      *
      * @param numberOfGists
-     * @param token
      * @returns {Promise<T[]>}
      */
-    async getRepos(numberOfGists, token) {
-        if (!token) {
-            throw new Error("token not set");
-        }
+    async getRepos(numberOfGists) {
+
         let response = await require('axios').default.post("https://api.github.com/graphql", {
             query: "query {\n" +
                 "  viewer {\n" +
@@ -66,7 +69,7 @@ class Git {
                 "    }\n" +
                 "  }\n" +
                 "}\n"
-        }, {headers: {Authorization: "Bearer " + token}});
+        }, {headers: {Authorization: "Bearer " + this.token}});
 
         return response.data.data.viewer.repositories.nodes.map(repo => {
             let date = new Date(repo.updatedAt);
@@ -81,13 +84,9 @@ class Git {
      * @param owner
      * @param repo
      * @param numberOfIssues
-     * @param token
      * @returns {Promise<T[]>}
      */
-    async getIssuesFromRepo(owner, repo, numberOfIssues, token) {
-        if (!token) {
-            throw new Error("token not set");
-        }
+    async getIssuesFromRepo(owner, repo, numberOfIssues) {
 
         let response = await require('axios').default.post("https://api.github.com/graphql", {
             query: "query {" +
@@ -111,10 +110,43 @@ class Git {
                 "    }\n" +
                 "  }" +
                 "}"
-        }, {headers: {Authorization: "Bearer " + token}});
+        }, {headers: {Authorization: "Bearer " + this.token}});
 
         if (typeof response !== 'undefined') {
             return response.data.data.repository.issues.nodes;
+        } else {
+            throw new Error('Was unable to fetch details on repository');
+        }
+    }
+
+    /**
+     * Get pull requests from a repository
+     *
+     * @param owner
+     * @param repo
+     * @param numberOfPrs
+     * @returns {Promise<ProfileNode[]|[]>}
+     */
+    async getPullRequests(owner, repo, numberOfPrs) {
+
+        let response = await require('axios').default.post("https://api.github.com/graphql", {
+            query: "query { \n" +
+                `  repository(owner: \"${owner}\", name:\"${repo}\"){\n` +
+                `    pullRequests(first: ${numberOfPrs}){\n` +
+                "      nodes {\n" +
+                "        author {\n" +
+                "          login\n" +
+                "        }\n" +
+                "        updatedAt\n" +
+                "        title\n" +
+                "      }\n" +
+                "    }\n" +
+                "  }\n" +
+                "}"
+        }, {headers: {Authorization: "Bearer " + this.token}});
+
+        if (typeof response !== 'undefined') {
+            return response.data.data.repository.pullRequests.nodes;
         } else {
             throw new Error('Was unable to fetch details on repository');
         }
