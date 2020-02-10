@@ -7,7 +7,7 @@ const Git = require('./Git');
 const fs = require('fs');
 
 /**
- * @class Bootstrap
+ * Creates App instance
  */
 class Bootstrap {
 

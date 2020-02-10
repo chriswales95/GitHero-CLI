@@ -1,13 +1,14 @@
 "use strict";
 
 /**
- * @class Git
+ * Class to interact with GitHub
  */
 class Git {
 
     /**
      * Constructor
      *
+     * @constructor
      * @param token
      */
     constructor(token) {
