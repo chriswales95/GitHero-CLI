@@ -1,4 +1,4 @@
-let Git = require('../src/Git');
+let Git = require('../src/GitHub');
 let git = new Git(null);
 
 it('GetRepos should fail without a token', async () => {

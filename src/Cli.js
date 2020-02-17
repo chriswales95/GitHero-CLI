@@ -14,6 +14,13 @@ const bootstrap = require('./Bootstrap.js');
 
 yargonaut.style('green');
 
+const commands = {
+    repos: "repos",
+    gists: "gists",
+    issues: "issues",
+    prs: "prs"
+};
+
 /**
  * @todo fix this so arguments work correctly
  */
@@ -44,17 +51,17 @@ let app = new bootstrap(argv).init();
 (() => {
 
     if (argv._.length > 1) {
-        console.error("Only one command at a time");
+        console.error("Only enter one command at a time");
         yargs.showHelp();
         return;
     }
 
-    let Git = require('./Git');
-    let git = new Git(app.config.token);
+    let GitHub = require('./GitHub');
+    let gh = new GitHub(app.config.token);
 
     switch (app.args._[0]) {
-        case 'issues':
-            git.getIssuesFromRepo(app.args.account, app.args.repository, app.args.num ? app.args.num : 10)
+        case commands.issues:
+            gh.getIssuesFromRepo(app.args.account, app.args.repository, app.args.num ? app.args.num : 10)
                 .then(res => {
                     console.log(res);
                 })
@@ -63,8 +70,8 @@ let app = new bootstrap(argv).init();
                 });
             break;
 
-        case "repos":
-            git.getRepos(app.args.num ? app.args.num : 10)
+        case commands.repos:
+            gh.getRepos(app.args.num ? app.args.num : 10)
                 .then(res => {
                     console.table(res, ['name', 'sshUrl', 'updatedAt'])
                 })
@@ -73,8 +80,8 @@ let app = new bootstrap(argv).init();
                 });
             break;
 
-        case "gists":
-            git.getGists(app.args.num ? app.args.num : 10)
+        case commands.gists:
+            gh.getGists(app.args.num ? app.args.num : 10)
                 .then((res) => {
                     console.table(res, ['description', 'url'])
                 })
@@ -83,8 +90,8 @@ let app = new bootstrap(argv).init();
                 });
             break;
 
-        case "prs":
-            git.getPullRequests(app.args.account, app.args.repository, app.args.num ? app.args.num : 10)
+        case commands.prs:
+            gh.getPullRequests(app.args.account, app.args.repository, app.args.num ? app.args.num : 10)
                 .then(res => {
                     console.table(res);
                 })

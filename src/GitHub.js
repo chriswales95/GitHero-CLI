@@ -3,7 +3,7 @@
 /**
  * Class to interact with GitHub
  */
-class Git {
+class GitHub {
 
     /**
      * Constructor
@@ -154,4 +154,4 @@ class Git {
     }
 }
 
-module.exports = Git;
+module.exports = GitHub;
