@@ -46,7 +46,7 @@ function outputResults(columnHeadings, data) {
     };
 
     let cols = columnHeadings.map(e => {
-        return chalk.bold(e);
+        return chalk.cyan.bold(e);
     });
 
     let output = [];
