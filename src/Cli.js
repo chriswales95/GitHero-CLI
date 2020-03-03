@@ -109,13 +109,16 @@ global.app = application;
 
     switch (app.args._[0]) {
         case commands.issues:
-            gh.getIssuesFromRepo(app.args.account, app.args.repository, app.args.num ? app.args.num : 10)
-                .then(res => {
-                    console.log(res);
-                })
-                .catch(err => {
-                    console.error(err);
+            let {GetIssuesCommand} = require('./Command');
+            let issues = new GetIssuesCommand().execute();
+
+
+            issues.then(result => {
+                result.forEach(res => {
+                    res.authorName = res.author.login;
                 });
+                outputResults(["title", "authorName", "createdAt"], result);
+            });
             break;
 
         case commands.repos:
