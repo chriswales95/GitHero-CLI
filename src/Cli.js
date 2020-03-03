@@ -12,7 +12,7 @@ const yargonaut = require('yargonaut');
 const yargs = require('yargs');
 const bootstrap = require('./Bootstrap.js');
 
-yargonaut.style('green');
+yargonaut.style('cyan');
 
 const commands = {
     repos: "repos",
@@ -20,6 +20,49 @@ const commands = {
     issues: "issues",
     prs: "prs"
 };
+
+function outputResults(columnHeadings, data) {
+    let chalk = require("chalk");
+    let {table} = require('table');
+
+    let config = {
+        border: {
+            topBody: `─`,
+            topJoin: `┬`,
+            topLeft: `┌`,
+            topRight: `┐`,
+            bottomBody: `─`,
+            bottomJoin: `┴`,
+            bottomLeft: `└`,
+            bottomRight: `┘`,
+            bodyLeft: `│`,
+            bodyRight: `│`,
+            bodyJoin: `│`,
+            joinBody: `─`,
+            joinLeft: `├`,
+            joinRight: `┤`,
+            joinJoin: `┼`
+        }
+    };
+
+    let cols = columnHeadings.map(e => {
+        return chalk.bold(e);
+    });
+
+    let output = [];
+    output.push(cols);
+
+    data.forEach(item => {
+        let row = [];
+        for (let i = 0; i < columnHeadings.length; i++) {
+            row.push(item[columnHeadings[i]]);
+        }
+        output.push(row)
+    });
+
+
+    console.log(table(output, config));
+}
 
 /**
  * @todo fix this so arguments work correctly
@@ -43,7 +86,12 @@ let argv = yargs
     .help()
     .argv;
 
-let app = new bootstrap(argv).init();
+/**
+ * Global app
+ * @type {Bootstrap}
+ */
+let application = new bootstrap(argv).init();
+global.app = application;
 
 /**
  * Process Arguments
@@ -71,13 +119,12 @@ let app = new bootstrap(argv).init();
             break;
 
         case commands.repos:
-            gh.getRepos(app.args.num ? app.args.num : 10)
-                .then(res => {
-                    console.table(res, ['name', 'sshUrl', 'updatedAt'])
-                })
-                .catch(err => {
-                    console.error(err);
-                });
+            let {GetReposCommand} = require('./Command');
+            let repos = new GetReposCommand().execute();
+
+            repos.then(result => {
+                outputResults(["name", "sshUrl", "updatedAt"], result);
+            });
             break;
 
         case commands.gists:
