@@ -65,6 +65,9 @@ let argv = yargs
                     type: 'string'
                 })]
         })
+    .command('gists [num]', 'get a list of your gists', () => {
+        return yargs.option(...borderlessOption)
+    })
     .command('repos [num]', 'get a list of your repositories', () => {
         return yargs.option(...borderlessOption)
     })
