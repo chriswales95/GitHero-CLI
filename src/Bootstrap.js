@@ -3,7 +3,7 @@
 const os = require('os');
 const process = require('process');
 const {exec} = require("child_process");
-const Git = require('./Git');
+const Git = require('./GitHub');
 const fs = require('fs');
 
 /**

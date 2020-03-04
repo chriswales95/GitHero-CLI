@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "axios": "^0.19.2",
+    "chalk": "^3.0.0",
     "process": "latest",
     "table": "^5.4.6",
     "yargonaut": "^1.1.4",
