@@ -139,6 +139,7 @@ class GitHub {
                 "          login\n" +
                 "        }\n" +
                 "        updatedAt\n" +
+                "        state" +
                 "        title\n" +
                 "      }\n" +
                 "    }\n" +

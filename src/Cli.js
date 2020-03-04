@@ -139,8 +139,9 @@ global.app = application;
             prs.then(result => {
                 result.forEach(res => {
                     res.authorName = res.author.login;
+                    res.state = res.state.toLowerCase();
                 });
-                outputResults(["title", "authorName", "updatedAt"], result);
+                outputResults(["title", "authorName", "state"], result);
             });
 
             break;
