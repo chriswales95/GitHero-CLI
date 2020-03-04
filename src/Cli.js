@@ -36,6 +36,11 @@ function outputResults(columnHeadings, data) {
     let output = [];
     output.push(cols);
 
+    if (app.args.raw) {
+        console.log(data);
+        return;
+    }
+
     data.forEach(item => {
         let row = [];
         for (let i = 0; i < columnHeadings.length; i++) {
@@ -53,6 +58,11 @@ const borderlessOption = ["borderless", {
     description: 'Output with no borders'
 }];
 
+const rawOption = ["raw", {
+    type: 'boolean',
+    description: 'Output raw JSON from GitHub'
+}];
+
 let argv = yargs
     .command(
         'config',
@@ -66,16 +76,16 @@ let argv = yargs
                 })]
         })
     .command('gists [num]', 'get a list of your gists', () => {
-        return yargs.option(...borderlessOption)
+        return [yargs.option(...borderlessOption), yargs.option(...rawOption)]
     })
     .command('repos [num]', 'get a list of your repositories', () => {
-        return yargs.option(...borderlessOption)
+        return [yargs.option(...borderlessOption), yargs.option(...rawOption)]
     })
     .command('issues <account> <repository> [num]', 'get issues from a repository', () => {
-        return yargs.option(...borderlessOption)
+        return [yargs.option(...borderlessOption), yargs.option(...rawOption)]
     })
     .command('prs <account> <repository> [num]', 'get pull requests from a repository', () => {
-        return yargs.option(...borderlessOption)
+        return [yargs.option(...borderlessOption), yargs.option(...rawOption)]
     })
     .help()
     .argv;
@@ -97,9 +107,6 @@ global.app = application;
         yargs.showHelp();
         return;
     }
-
-    let GitHub = require('./GitHub');
-    let gh = new GitHub(app.config.token);
 
     switch (app.args._[0]) {
         case commands.issues:
