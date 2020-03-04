@@ -26,7 +26,7 @@ function outputResults(columnHeadings, data) {
     let {table, getBorderCharacters} = require('table');
 
     let config = {
-        border: app.args.bl === true ? getBorderCharacters('void') : getBorderCharacters('ramac')
+        border: app.args.b === true ? getBorderCharacters('void') : getBorderCharacters('ramac')
     };
 
     let cols = columnHeadings.map(e => {
