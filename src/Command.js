@@ -56,4 +56,16 @@ class GetPrsCommand extends Command {
     }
 }
 
-module.exports = {GetReposCommand, GetIssuesCommand, GetPrsCommand};
+class GetGistsCommand extends Command {
+
+    execute() {
+        super.execute();
+
+        let GitHub = require('./GitHub'),
+            gh = new GitHub(app.config.token);
+
+        return gh.getGists(app.args.num ? app.args.num : 10)
+    }
+}
+
+module.exports = {GetReposCommand, GetIssuesCommand, GetPrsCommand, GetGistsCommand};

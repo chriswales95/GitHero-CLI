@@ -124,13 +124,12 @@ global.app = application;
             break;
 
         case commands.gists:
-            gh.getGists(app.args.num ? app.args.num : 10)
-                .then((res) => {
-                    console.table(res, ['description', 'url'])
-                })
-                .catch(err => {
-                    console.error(err);
-                });
+            let {GetGistsCommand} = require('./Command');
+            let gists = new GetGistsCommand().execute();
+
+            gists.then(result => {
+                outputResults(["description", "url", "isPublic"], result);
+            });
             break;
 
         case commands.prs:
