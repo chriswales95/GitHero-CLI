@@ -23,26 +23,10 @@ const commands = {
 
 function outputResults(columnHeadings, data) {
     let chalk = require("chalk");
-    let {table} = require('table');
+    let {table, getBorderCharacters} = require('table');
 
     let config = {
-        border: {
-            topBody: `─`,
-            topJoin: `┬`,
-            topLeft: `┌`,
-            topRight: `┐`,
-            bottomBody: `─`,
-            bottomJoin: `┴`,
-            bottomLeft: `└`,
-            bottomRight: `┘`,
-            bodyLeft: `│`,
-            bodyRight: `│`,
-            bodyJoin: `│`,
-            joinBody: `─`,
-            joinLeft: `├`,
-            joinRight: `┤`,
-            joinJoin: `┼`
-        }
+        border: app.args.bl === true ? getBorderCharacters('void') : getBorderCharacters('ramac')
     };
 
     let cols = columnHeadings.map(e => {
@@ -60,13 +44,15 @@ function outputResults(columnHeadings, data) {
         output.push(row)
     });
 
-
     console.log(table(output, config));
 }
 
-/**
- * @todo fix this so arguments work correctly
- */
+const borderlessOption = ["borderless", {
+    alias: 'bl',
+    type: 'boolean',
+    description: 'Output with no borders'
+}];
+
 let argv = yargs
     .command(
         'config',
@@ -79,10 +65,15 @@ let argv = yargs
                     type: 'string'
                 })]
         })
-    .command('repos [num]', 'get a list of your repositories')
-    .command('gists [num]', 'get a list of your gists')
-    .command('issues <account> <repository> [num]', 'get issues from a repository')
-    .command('prs <account> <repository> [num]', 'get pull requests from a repository')
+    .command('repos [num]', 'get a list of your repositories', () => {
+        return yargs.option(...borderlessOption)
+    })
+    .command('issues <account> <repository> [num]', 'get issues from a repository', () => {
+        return yargs.option(...borderlessOption)
+    })
+    .command('prs <account> <repository> [num]', 'get pull requests from a repository', () => {
+        return yargs.option(...borderlessOption)
+    })
     .help()
     .argv;
 
@@ -111,7 +102,6 @@ global.app = application;
         case commands.issues:
             let {GetIssuesCommand} = require('./Command');
             let issues = new GetIssuesCommand().execute();
-
 
             issues.then(result => {
                 result.forEach(res => {

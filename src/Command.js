@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * Abstract class for Commands
  */
