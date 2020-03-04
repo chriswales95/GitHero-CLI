@@ -131,13 +131,16 @@ global.app = application;
             break;
 
         case commands.prs:
-            gh.getPullRequests(app.args.account, app.args.repository, app.args.num ? app.args.num : 10)
-                .then(res => {
-                    console.table(res);
-                })
-                .catch(err => {
-                    console.error(err);
+            let {GetPrsCommand} = require('./Command');
+            let prs = new GetPrsCommand().execute();
+
+            prs.then(result => {
+                result.forEach(res => {
+                    res.authorName = res.author.login;
                 });
+                outputResults(["title", "authorName", "updatedAt"], result);
+            });
+
             break;
 
         default:
