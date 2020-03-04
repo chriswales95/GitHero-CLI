@@ -48,7 +48,7 @@ function outputResults(columnHeadings, data) {
 }
 
 const borderlessOption = ["borderless", {
-    alias: 'bl',
+    alias: 'b',
     type: 'boolean',
     description: 'Output with no borders'
 }];
