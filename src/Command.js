@@ -12,7 +12,7 @@ class Command {
     }
 
     log() {
-        console.log(`${this.constructor.name} executed...`);
+    //    console.log(`${this.constructor.name} executed...`);
     }
 }
 
