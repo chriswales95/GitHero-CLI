@@ -113,10 +113,12 @@ global.app = new bootstrap(argv).init();
             let issues = new GetIssuesCommand().execute();
 
             issues.then(result => {
-                result.forEach(res => {
-                    res.authorName = res.author.login;
+                result.nodes.forEach(res => {
+                    res.authorName = res.node.author ? res.node.author.login : "none";
+                    res.title = res.node.title;
+                    res.createdAt = res.node.createdAt;
                 });
-                outputResults(["title", "authorName", "createdAt"], result);
+                outputResults(["title", "authorName", "createdAt"], result.nodes);
             });
             break;
 

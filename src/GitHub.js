@@ -85,36 +85,55 @@ class GitHub {
      * @param owner
      * @param repo
      * @param numberOfIssues
+     * @param endCursor
      * @returns {Promise<T[]>}
      */
-    async getIssuesFromRepo(owner, repo, numberOfIssues) {
+    async getIssuesFromRepo(owner, repo, numberOfIssues, endCursor = null) {
+
+        if (numberOfIssues > 100)
+            numberOfIssues = 100;
 
         let response = await require('axios').default.post("https://api.github.com/graphql", {
-            query: "query {" +
+            query: "query " +
+                "{\n" +
                 `repository(name: \"${repo}\", owner: \"${owner}\") {\n` +
-                `    issues(first: ${numberOfIssues}) {\n` +
-                "      nodes {\n" +
-                "        author {\n" +
-                "          login\n" +
-                "        }\n" +
-                "        createdAt\n" +
-                "        updatedAt\n" +
-                "        number\n" +
-                "        url\n" +
-                "        title\n" +
-                "      participants(first: 3){\n" +
-                "          nodes {\n" +
-                "            email\n" +
+                `    issues(first: ${numberOfIssues}, after: ${endCursor}) {\n` +
+                "      pageInfo {\n" +
+                "        endCursor\n" +
+                "        hasNextPage\n" +
+                "        startCursor\n" +
+                "        hasPreviousPage\n" +
+                "      }\n" +
+                "      totalCount\n" +
+                "      edges {\n" +
+                "        node {\n" +
+                "          author {\n" +
+                "            login\n" +
+                "          }\n" +
+                "          createdAt\n" +
+                "          updatedAt\n" +
+                "          number\n" +
+                "          url\n" +
+                "          title\n" +
+                "          closed\n" +
+                "          participants(first: 3) {\n" +
+                "            nodes {\n" +
+                "              email\n" +
+                "            }\n" +
                 "          }\n" +
                 "        }\n" +
                 "      }\n" +
                 "    }\n" +
-                "  }" +
+                "  }\n" +
                 "}"
         }, {headers: {Authorization: "Bearer " + this.token}});
 
         if (typeof response !== 'undefined') {
-            return response.data.data.repository.issues.nodes;
+            return {
+                nodes: response.data.data.repository.issues.edges,
+                count: response.data.data.repository.issues.totalCount,
+                pageInfo: response.data.data.repository.issues.pageInfo
+            }
         } else {
             throw new Error('Was unable to fetch details on repository');
         }
