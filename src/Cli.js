@@ -144,7 +144,7 @@ global.app = new bootstrap(argv).init();
 
             prs.then(result => {
                 result.nodes.forEach(res => {
-                    res.authorName = res.node.author.login;
+                    res.authorName = res.node.author ? res.node.author.login : "none";
                     res.state = res.node.state.toLowerCase();
                     res.title = res.node.title;
                 });
