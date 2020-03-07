@@ -126,21 +126,39 @@ class GitHub {
      * @param owner
      * @param repo
      * @param numberOfPrs
+     * @param endCursor
      * @returns {Promise<T[]>}
      */
-    async getPullRequests(owner, repo, numberOfPrs) {
+    async getPullRequests(owner, repo, numberOfPrs, endCursor = null) {
+
+        if (numberOfPrs > 100)
+            numberOfPrs = 100;
+
+        // easier to handle formatting but a bit messy...
+        let endCursorQuery = `    pullRequests(first: ${numberOfPrs}, after: ${endCursor}){\n`;
+        if (endCursor)
+            endCursorQuery = `    pullRequests(first: ${numberOfPrs}, after: \"${endCursor}\"){\n`;
 
         let response = await require('axios').default.post("https://api.github.com/graphql", {
             query: "query { \n" +
                 `  repository(owner: \"${owner}\", name:\"${repo}\"){\n` +
-                `    pullRequests(first: ${numberOfPrs}){\n` +
-                "      nodes {\n" +
-                "        author {\n" +
-                "          login\n" +
+                endCursorQuery +
+                "      pageInfo {\n" +
+                "        startCursor\n" +
+                "        hasNextPage\n" +
+                "        endCursor\n" +
+                "      }\n" +
+                "      totalCount\n" +
+                "      edges {\n" +
+                "        cursor\n" +
+                "        node {\n" +
+                "          updatedAt\n" +
+                "          state\n" +
+                "          title\n" +
+                "          author {\n" +
+                "            login\n" +
+                "          }\n" +
                 "        }\n" +
-                "        updatedAt\n" +
-                "        state" +
-                "        title\n" +
                 "      }\n" +
                 "    }\n" +
                 "  }\n" +
@@ -148,7 +166,11 @@ class GitHub {
         }, {headers: {Authorization: "Bearer " + this.token}});
 
         if (typeof response !== 'undefined') {
-            return response.data.data.repository.pullRequests.nodes;
+            return {
+                nodes: response.data.data.repository.pullRequests.edges,
+                count: response.data.data.repository.pullRequests.totalCount,
+                pageInfo: response.data.data.repository.pullRequests.pageInfo
+            }
         } else {
             throw new Error('Was unable to fetch details on repository');
         }

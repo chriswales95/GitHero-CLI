@@ -45,14 +45,34 @@ class GetIssuesCommand extends Command {
 
 class GetPrsCommand extends Command {
 
-    execute() {
+    constructor(endCursor, numToFetch) {
+        super();
+        this.endCursor = endCursor;
+        this.numToFetch = numToFetch;
+    }
+
+    async execute() {
         super.execute();
 
+        let resObj = {
+            res: {},
+            nodes: []
+        };
         let GitHub = require('./GitHub'),
             gh = new GitHub(app.config.token);
 
-        return gh.getPullRequests(app.args.account, app.args.repository, app.args.num ? app.args.num : 10)
+        let numNeeded = app.args.num;
+        let pages = Math.ceil((numNeeded / 100));
+        let endCursor = null;
 
+        for (let i = 0; i < pages; i++) {
+            let res = await gh.getPullRequests(app.args.account, app.args.repository, numNeeded ? numNeeded : 10, endCursor);
+            resObj.res = res;
+            resObj.nodes = resObj.nodes.concat(res.nodes);
+            endCursor = res.pageInfo.endCursor.substring(0, res.pageInfo.endCursor.length - 2);
+            numNeeded -= 100;
+        }
+        return resObj;
     }
 }
 

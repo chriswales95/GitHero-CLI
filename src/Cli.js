@@ -94,8 +94,7 @@ let argv = yargs
  * Global app
  * @type {Bootstrap}
  */
-let application = new bootstrap(argv).init();
-global.app = application;
+global.app = new bootstrap(argv).init();
 
 /**
  * Process Arguments
@@ -144,13 +143,13 @@ global.app = application;
             let prs = new GetPrsCommand().execute();
 
             prs.then(result => {
-                result.forEach(res => {
-                    res.authorName = res.author.login;
-                    res.state = res.state.toLowerCase();
+                result.nodes.forEach(res => {
+                    res.authorName = res.node.author.login;
+                    res.state = res.node.state.toLowerCase();
+                    res.title = res.node.title;
                 });
-                outputResults(["title", "authorName", "state"], result);
+                outputResults(["title", "authorName", "state"], result.nodes);
             });
-
             break;
 
         default:
