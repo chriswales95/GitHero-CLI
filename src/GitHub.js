@@ -153,15 +153,10 @@ class GitHub {
         if (numberOfPrs > 100)
             numberOfPrs = 100;
 
-        // easier to handle formatting but a bit messy...
-        let endCursorQuery = `    pullRequests(first: ${numberOfPrs}, after: ${endCursor}){\n`;
-        if (endCursor)
-            endCursorQuery = `    pullRequests(first: ${numberOfPrs}, after: \"${endCursor}\"){\n`;
-
         let response = await require('axios').default.post("https://api.github.com/graphql", {
             query: "query { \n" +
                 `  repository(owner: \"${owner}\", name:\"${repo}\"){\n` +
-                endCursorQuery +
+                `    pullRequests(first: ${numberOfPrs}, after: ${endCursor}) {\n` +
                 "      pageInfo {\n" +
                 "        startCursor\n" +
                 "        hasNextPage\n" +

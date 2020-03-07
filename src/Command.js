@@ -92,7 +92,7 @@ class GetPrsCommand extends Command {
             let res = await gh.getPullRequests(app.args.account, app.args.repository, numNeeded ? numNeeded : 10, endCursor);
             resObj.res = res;
             resObj.nodes = resObj.nodes.concat(res.nodes);
-            endCursor = res.pageInfo.endCursor;
+            endCursor = `\"${res.pageInfo.endCursor}\"`;
             numNeeded -= 100;
         }
         return resObj;
