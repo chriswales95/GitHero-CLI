@@ -37,7 +37,7 @@ function outputResults(columnHeadings, data) {
     output.push(cols);
 
     if (app.args.raw) {
-        console.log(data);
+        console.log(JSON.stringify(data));
         return;
     }
 
