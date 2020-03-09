@@ -19,31 +19,46 @@ class GitHub {
      * Get Gists
      *
      * @param numberOfGists
+     * @param endCursor
      * @returns {Promise<T[]>}
      */
-    async getGists(numberOfGists) {
+    async getGists(numberOfGists, endCursor = null) {
+
+        if (numberOfGists > 100)
+            numberOfGists = 100;
 
         let response = await require('axios').default.post("https://api.github.com/graphql", {
-            query: "query {\n" +
+            query: "{\n" +
                 "  viewer {\n" +
                 "    resourcePath\n" +
-                `    gists(first: ${numberOfGists}, privacy: ALL) {\n` +
-                "    totalCount\n" +
-                "      nodes {\n" +
-                "        description\n" +
-                "        url\n" +
-                "        isPublic\n" +
-                "        isFork\n" +
-                "        resourcePath\n" +
+                `    gists(first: ${numberOfGists}, privacy: ALL, after: ${endCursor}) {\n` +
+                "      totalCount\n" +
+                "      pageInfo {\n" +
+                "        startCursor\n" +
+                "        endCursor\n" +
+                "        hasNextPage\n" +
+                "        hasPreviousPage\n" +
+                "      }\n" +
+                "      edges {\n" +
+                "        cursor\n" +
+                "        node {\n" +
+                "          description\n" +
+                "          url\n" +
+                "          isPublic\n" +
+                "          isFork\n" +
+                "          resourcePath\n" +
+                "        }\n" +
                 "      }\n" +
                 "    }\n" +
                 "  }\n" +
                 "}\n"
         }, {headers: {Authorization: "Bearer " + this.token}});
 
-        return response.data.data.viewer.gists.nodes.map(gist => {
-            return gist;
-        });
+        return {
+            nodes: response.data.data.viewer.gists.edges,
+            count: response.data.data.viewer.gists.totalCount,
+            pageInfo: response.data.data.viewer.gists.pageInfo
+        }
     }
 
     /**

@@ -136,7 +136,12 @@ global.app = new bootstrap(argv).init();
             let gists = new GetGistsCommand().execute();
 
             gists.then(result => {
-                outputResults(["description", "url", "isPublic"], result);
+                result.nodes.forEach(res => {
+                    res.description = res.node.description;
+                    res.url = res.nodeurl;
+                    res.isPublic = res.node.isPublic;
+                });
+                outputResults(["description", "url", "isPublic"], result.nodes);
             });
             break;
 

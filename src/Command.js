@@ -101,14 +101,31 @@ class GetPrsCommand extends Command {
 
 class GetGistsCommand extends Command {
 
-    execute() {
-        super.execute();
+   async execute() {
+       super.execute();
 
-        let GitHub = require('./GitHub'),
-            gh = new GitHub(app.config.token);
+       let resObj = {
+           res: {},
+           nodes: []
+       };
 
-        return gh.getGists(app.args.num ? app.args.num : 10)
-    }
+       let GitHub = require('./GitHub'),
+           gh = new GitHub(app.config.token);
+
+       let numNeeded = app.args.num;
+       let pages = Math.ceil((numNeeded / 100));
+       let endCursor = null;
+
+       for (let i = 0; i < pages; i++) {
+           let res = await gh.getGists(numNeeded ? numNeeded : 10, endCursor);
+           resObj.res = res;
+           resObj.nodes = resObj.nodes.concat(res.nodes);
+           endCursor = `\"${res.pageInfo.endCursor}\"`;
+           numNeeded -= 100;
+       }
+
+       return gh.getGists(app.args.num ? app.args.num : 10)
+   }
 }
 
 module.exports = {GetReposCommand, GetIssuesCommand, GetPrsCommand, GetGistsCommand};
