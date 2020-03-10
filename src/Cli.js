@@ -94,8 +94,7 @@ let argv = yargs
  * Global app
  * @type {Bootstrap}
  */
-let application = new bootstrap(argv).init();
-global.app = application;
+global.app = new bootstrap(argv).init();
 
 /**
  * Process Arguments
@@ -114,10 +113,12 @@ global.app = application;
             let issues = new GetIssuesCommand().execute();
 
             issues.then(result => {
-                result.forEach(res => {
-                    res.authorName = res.author.login;
+                result.nodes.forEach(res => {
+                    res.authorName = res.node.author ? res.node.author.login : "none";
+                    res.title = res.node.title;
+                    res.createdAt = res.node.createdAt;
                 });
-                outputResults(["title", "authorName", "createdAt"], result);
+                outputResults(["title", "authorName", "createdAt"], result.nodes);
             });
             break;
 
@@ -135,7 +136,12 @@ global.app = application;
             let gists = new GetGistsCommand().execute();
 
             gists.then(result => {
-                outputResults(["description", "url", "isPublic"], result);
+                result.nodes.forEach(res => {
+                    res.description = res.node.description;
+                    res.url = res.nodeurl;
+                    res.isPublic = res.node.isPublic;
+                });
+                outputResults(["description", "url", "isPublic"], result.nodes);
             });
             break;
 
@@ -144,13 +150,13 @@ global.app = application;
             let prs = new GetPrsCommand().execute();
 
             prs.then(result => {
-                result.forEach(res => {
-                    res.authorName = res.author.login;
-                    res.state = res.state.toLowerCase();
+                result.nodes.forEach(res => {
+                    res.authorName = res.node.author ? res.node.author.login : "none";
+                    res.state = res.node.state.toLowerCase();
+                    res.title = res.node.title;
                 });
-                outputResults(["title", "authorName", "state"], result);
+                outputResults(["title", "authorName", "state"], result.nodes);
             });
-
             break;
 
         default:
