@@ -127,7 +127,12 @@ global.app = new bootstrap(argv).init();
             let repos = new GetReposCommand().execute();
 
             repos.then(result => {
-                outputResults(["name", "sshUrl", "updatedAt"], result);
+                result.nodes.forEach(res => {
+                    res.name = res.node.name;
+                    res.sshUrl = res.node.sshUrl;
+                    res.updatedAt = res.node.updatedAt;
+                });
+                outputResults(["name", "sshUrl", "updatedAt"], result.nodes);
             });
             break;
 

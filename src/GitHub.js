@@ -64,34 +64,45 @@ class GitHub {
     /**
      * Get repos
      *
-     * @param numberOfGists
+     * @param numberOfRepos
      * @returns {Promise<T[]>}
      */
-    async getRepos(numberOfGists) {
+    async getRepos(numberOfRepos, endCursor) {
+
+        if (numberOfRepos > 100)
+            numberOfRepos = 100;
 
         let response = await require('axios').default.post("https://api.github.com/graphql", {
-            query: "query {\n" +
-                "  viewer {\n" +
-                "    resourcePath\n" +
-                `    repositories(first: ${numberOfGists}) {\n` +
+            query: "query { \n" +
+                `  viewer {\n` +
+                `    repositories(first: ${numberOfRepos}, after: ${endCursor}) {\n` +
                 "      totalCount\n" +
-                "      nodes {\n" +
-                "        name\n" +
-                "        isFork\n" +
-                "        url\n" +
-                "        sshUrl\n" +
-                "        updatedAt\n" +
+                "      pageInfo {\n" +
+                "        startCursor\n" +
+                "        endCursor\n" +
+                "        hasPreviousPage\n" +
+                "        hasNextPage\n" +
+                "      }\n" +
+                "      edges {\n" +
+                "        cursor\n" +
+                "        node {\n" +
+                "          name\n" +
+                "          isFork\n" +
+                "          updatedAt\n" +
+                "          url\n" +
+                "          sshUrl\n" +
+                "        }\n" +
                 "      }\n" +
                 "    }\n" +
                 "  }\n" +
-                "}\n"
+                "}"
         }, {headers: {Authorization: "Bearer " + this.token}});
 
-        return response.data.data.viewer.repositories.nodes.map(repo => {
-            let date = new Date(repo.updatedAt);
-            repo.updatedAt = `${date.toLocaleDateString()} ${date.toTimeString()}`;
-            return repo;
-        });
+        return {
+            nodes: response.data.data.viewer.repositories.edges,
+            count: response.data.data.viewer.repositories.totalCount,
+            pageInfo: response.data.data.viewer.repositories.pageInfo
+        };
     }
 
     /**
