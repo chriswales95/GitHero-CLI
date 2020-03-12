@@ -18,20 +18,19 @@ class GitHub {
     /**
      * Get Gists
      *
-     * @param numberOfGists
-     * @param endCursor
+     * @param options
      * @returns {Promise<T[]>}
      */
-    async getGists(numberOfGists, endCursor = null) {
+    async getGists(options) {
 
-        if (numberOfGists > 100)
-            numberOfGists = 100;
+        if (options.numNeeded > 100)
+            options.numNeeded = 100;
 
         let response = await require('axios').default.post("https://api.github.com/graphql", {
             query: "{\n" +
                 "  viewer {\n" +
                 "    resourcePath\n" +
-                `    gists(first: ${numberOfGists}, privacy: ALL, after: ${endCursor}) {\n` +
+                `    gists(first: ${options.numNeeded}, privacy: ALL, after: ${options.endCursor}) {\n` +
                 "      totalCount\n" +
                 "      pageInfo {\n" +
                 "        startCursor\n" +
@@ -64,18 +63,18 @@ class GitHub {
     /**
      * Get repos
      *
-     * @param numberOfRepos
+     * @param options
      * @returns {Promise<T[]>}
      */
-    async getRepos(numberOfRepos, endCursor) {
+    async getRepos(options) {
 
-        if (numberOfRepos > 100)
-            numberOfRepos = 100;
+        if (options.numNeeded > 100)
+            options.numNeeded = 100;
 
         let response = await require('axios').default.post("https://api.github.com/graphql", {
             query: "query { \n" +
                 `  viewer {\n` +
-                `    repositories(first: ${numberOfRepos}, after: ${endCursor}) {\n` +
+                `    repositories(first: ${options.numNeeded}, after: ${options.endCursor}) {\n` +
                 "      totalCount\n" +
                 "      pageInfo {\n" +
                 "        startCursor\n" +
@@ -108,22 +107,19 @@ class GitHub {
     /**
      * Gets issues from a specified repository
      *
-     * @param owner
-     * @param repo
-     * @param numberOfIssues
-     * @param endCursor
+     * @param options
      * @returns {Promise<T[]>}
      */
-    async getIssuesFromRepo(owner, repo, numberOfIssues, endCursor = null) {
+    async getIssuesFromRepo(options) {
 
-        if (numberOfIssues > 100)
-            numberOfIssues = 100;
+        if (options.numNeeded > 100)
+            options.numNeeded = 100;
 
         let response = await require('axios').default.post("https://api.github.com/graphql", {
             query: "query " +
                 "{\n" +
-                `repository(name: \"${repo}\", owner: \"${owner}\") {\n` +
-                `    issues(first: ${numberOfIssues}, after: ${endCursor}) {\n` +
+                `repository(name: \"${options.repo}\", owner: \"${options.owner}\") {\n` +
+                `    issues(first: ${options.numNeeded}, after: ${options.endCursor}) {\n` +
                 "      pageInfo {\n" +
                 "        endCursor\n" +
                 "        hasNextPage\n" +
@@ -168,21 +164,18 @@ class GitHub {
     /**
      * Get pull requests from a repository
      *
-     * @param owner
-     * @param repo
-     * @param numberOfPrs
-     * @param endCursor
+     * @param options
      * @returns {Promise<T[]>}
      */
-    async getPullRequests(owner, repo, numberOfPrs, endCursor = null) {
+    async getPullRequests(options) {
 
-        if (numberOfPrs > 100)
-            numberOfPrs = 100;
+        if (options.numNeeded > 100)
+            options.numNeeded = 100;
 
         let response = await require('axios').default.post("https://api.github.com/graphql", {
             query: "query { \n" +
-                `  repository(owner: \"${owner}\", name:\"${repo}\"){\n` +
-                `    pullRequests(first: ${numberOfPrs}, after: ${endCursor}) {\n` +
+                `  repository(owner: \"${options.owner}\", name:\"${options.repo}\"){\n` +
+                `    pullRequests(first: ${options.numNeeded}, after: ${options.endCursor}) {\n` +
                 "      pageInfo {\n" +
                 "        startCursor\n" +
                 "        hasNextPage\n" +
