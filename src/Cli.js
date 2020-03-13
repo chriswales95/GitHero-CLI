@@ -143,7 +143,7 @@ global.app = new bootstrap(argv).init();
             gists.then(result => {
                 result.nodes.forEach(res => {
                     res.description = res.node.description;
-                    res.url = res.nodeurl;
+                    res.url = res.node.url;
                     res.isPublic = res.node.isPublic;
                 });
                 outputResults(["description", "url", "isPublic"], result.nodes);
