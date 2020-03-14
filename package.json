@@ -4,7 +4,7 @@
   "version": "1.0.0-beta-1",
   "scripts": {
     "start": "src/Cli.js",
-    "test": "jest",
+    "test": "jest --coverage",
     "docs": "jsdoc src && serve out"
   },
   "dependencies": {
