@@ -99,9 +99,9 @@ global.app = new bootstrap(argv).init();
 /**
  * Process Arguments
  */
-(() => {
+function processArgs() {
 
-    if (argv._.length > 1) {
+    if (argv._.length > 1 && app) {
         console.error("Only enter one command at a time");
         yargs.showHelp();
         return;
@@ -167,4 +167,9 @@ global.app = new bootstrap(argv).init();
         default:
             yargs.showHelp();
     }
-})();
+}
+
+if (!global.test)
+    processArgs();
+
+module.exports = {outputResults};
