@@ -12,7 +12,12 @@ class GitHub {
      * @param token
      */
     constructor(token) {
-        this.token = token
+        this._token = token;
+    }
+
+
+    get token() {
+        return this._token;
     }
 
     /**
