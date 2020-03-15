@@ -1,7 +1,8 @@
 "use strict";
 
 /**
- * Class to interact with GitHub
+ * @class
+ * @classdesc Class to interact with GitHub
  */
 class GitHub {
 
@@ -9,13 +10,18 @@ class GitHub {
      * Constructor
      *
      * @constructor
-     * @param token
+     * @param token {string} users API token
      */
     constructor(token) {
         this._token = token;
     }
 
 
+    /**
+     * Returns token
+     *
+     * @returns {string}
+     */
     get token() {
         return this._token;
     }
@@ -23,7 +29,7 @@ class GitHub {
     /**
      * Get Gists
      *
-     * @param options
+     * @param options {Object} options object
      * @returns {Promise<T[]>}
      */
     async getGists(options) {
@@ -68,7 +74,7 @@ class GitHub {
     /**
      * Get repos
      *
-     * @param options
+     * @param options {Object} options object
      * @returns {Promise<T[]>}
      */
     async getRepos(options) {
@@ -112,7 +118,7 @@ class GitHub {
     /**
      * Gets issues from a specified repository
      *
-     * @param options
+     * @param options{Object} options object
      * @returns {Promise<T[]>}
      */
     async getIssuesFromRepo(options) {

@@ -3,7 +3,7 @@
 /**
  * GitHero CLI
  *
- * Christopher Wales
+ * @author Christopher Wales
  */
 
 "use strict";
@@ -14,6 +14,11 @@ const bootstrap = require('./Bootstrap.js');
 
 yargonaut.style('cyan');
 
+/**
+ * Key value pair for commands
+ *
+ * @type {Object}
+ */
 const commands = {
     repos: "repos",
     gists: "gists",
@@ -21,6 +26,12 @@ const commands = {
     prs: "prs"
 };
 
+/**
+ * @description output results to console
+ *
+ * @param columnHeadings {Array<string>} column headings
+ * @param data {Object} data object
+ */
 function outputResults(columnHeadings, data) {
     let chalk = require("chalk");
     let {table, getBorderCharacters} = require('table');
@@ -52,17 +63,26 @@ function outputResults(columnHeadings, data) {
     console.log(table(output, config));
 }
 
+/**
+ * option passed in to specify borderless data output
+ */
 const borderlessOption = ["borderless", {
     alias: 'b',
     type: 'boolean',
     description: 'Output with no borders'
 }];
 
+/**
+ * option passed in to specify raw data output
+ */
 const rawOption = ["raw", {
     type: 'boolean',
     description: 'Output raw JSON from GitHub'
 }];
 
+/**
+ *
+ */
 let argv = yargs
     .command(
         'config',
@@ -91,7 +111,9 @@ let argv = yargs
     .argv;
 
 /**
- * Global app
+ * @description Global application object
+ *
+ * @global
  * @type {Bootstrap}
  */
 global.app = new bootstrap(argv).init();
@@ -169,7 +191,8 @@ function processArgs() {
     }
 }
 
+// Disable this bit when running tests
 if (!global.test)
     processArgs();
 
-module.exports = {outputResults};
+module.exports = {outputResults, processArgs};

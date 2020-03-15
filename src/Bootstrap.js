@@ -1,13 +1,11 @@
 "use strict";
 
 const os = require('os');
-const process = require('process');
-const {exec} = require("child_process");
-const Git = require('./GitHub');
 const fs = require('fs');
 
 /**
- * Creates App instance
+ * @class
+ * @classdesc Creates App instance
  */
 class Bootstrap {
 
@@ -24,64 +22,49 @@ class Bootstrap {
     }
 
     /**
-     * Init the app
+     * Returns OS
      *
-     * @returns {Bootstrap}
+     * @readonly
+     * @returns {NodeJS.Platform}
      */
-    init() {
-
-        // Check OS
-        if (this._os !== 'darwin') {
-            console.warn('Warning: githero has not been tested outside of Mac OS but give it a go');
-        }
-
-        // check for config
-        try {
-            if (!fs.existsSync(`${os.homedir()}/.githero.json`)) {
-                // get essential details e.g. api key or we can't do anything
-                console.log("\nHold on!\n\nTo continue, you'll need to provide GitHero with an API key from Github! We can't do anything otherwise ¯\\_(ツ)_/¯");
-                console.log("https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line");
-                this._config = {};
-                this.storeConfig(this._config);
-            } else {
-                // read config
-                this._config = JSON.parse(fs.readFileSync(`${os.homedir()}/.githero.json`, 'utf8'));
-            }
-        } catch (e) {
-            console.trace(e);
-        }
-        this.checkArgs(this._args);
-        return this;
+    get os() {
+        return this._os;
     }
 
     /**
-     * Check arguments for config
+     * Return logging level
      *
-     * @param args
+     * @returns {string}
      */
-    checkArgs(args) {
-        let updateConfig = false;
-        if (args._.includes('config') && (this._args.token || this._args.t)) {
-            this._config.token = this._args.token || this._args.t;
-            updateConfig = true;
-        }
-        if (updateConfig) {
-            this.storeConfig(this._config);
-        }
+    get loggingLevel() {
+        return this._loggingLevel;
     }
 
     /**
-     * Store configuration
+     * Set logging level
      *
-     * @param config
+     * @param value
      */
-    storeConfig(config) {
-        fs.writeFile(`${os.homedir()}/.githero.json`, JSON.stringify(config), function (err) {
-            if (err) {
-                console.log('There has been an error saving your configuration data.');
-                console.log(err.message);
-            }
-        });
+    set loggingLevel(value) {
+        this._loggingLevel = value;
+    }
+
+    /**
+     * Set arguments
+     *
+     * @param value
+     */
+    set args(value) {
+        this._args = value;
+    }
+
+    /**
+     * Set config
+     *
+     * @param value
+     */
+    set config(value) {
+        this._config = value;
     }
 
     /**
@@ -100,6 +83,67 @@ class Bootstrap {
      */
     get args() {
         return this._args;
+    }
+
+    /**
+     * Init the app
+     *
+     * @returns {Bootstrap}
+     */
+    init() {
+
+        // Check OS
+        if (this.os !== 'darwin') {
+            console.warn('Warning: githero has not been tested outside of Mac OS but give it a go');
+        }
+
+        // check for config
+        try {
+            if (!fs.existsSync(`${os.homedir()}/.githero.json`)) {
+                // get essential details e.g. api key or we can't do anything
+                console.log("\nHold on!\n\nTo continue, you'll need to provide GitHero with an API key from Github! We can't do anything otherwise ¯\\_(ツ)_/¯");
+                console.log("https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line");
+                this.config = {};
+                this.storeConfig(this._config);
+            } else {
+                // read config
+                this.config = JSON.parse(fs.readFileSync(`${os.homedir()}/.githero.json`, 'utf8'));
+            }
+        } catch (e) {
+            console.trace(e);
+        }
+        this.checkArgs(this.args);
+        return this;
+    }
+
+    /**
+     * Check arguments for config
+     *
+     * @param args {Object} argument object
+     */
+    checkArgs(args) {
+        let updateConfig = false;
+        if (args._.includes('config') && (this.args.token || this.args.t)) {
+            this.config.token = this.args.token || this.args.t;
+            updateConfig = true;
+        }
+        if (updateConfig) {
+            this.storeConfig(this.config);
+        }
+    }
+
+    /**
+     * Store configuration
+     *
+     * @param config {Object} config object
+     */
+    storeConfig(config) {
+        fs.writeFile(`${os.homedir()}/.githero.json`, JSON.stringify(config), function (err) {
+            if (err) {
+                console.log('There has been an error saving your configuration data.');
+                console.log(err.message);
+            }
+        });
     }
 }
 
