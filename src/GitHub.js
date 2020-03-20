@@ -16,7 +16,6 @@ class GitHub {
         this._token = token;
     }
 
-
     /**
      * Returns token
      *
