@@ -1,70 +1,210 @@
 "use strict";
 
 /**
- * Abstract class for Commands
+ * @class
+ * @classdesc Abstract class for Commands
  */
 class Command {
-    execute() {
+
+    /**
+     * @constructor
+     * @param usesGithubV4 {boolean} uses the GitHub GraphQL API
+     */
+    constructor(usesGithubV4 = false) {
+        this._usesGithubV4 = usesGithubV4;
+        this._numNeeded = app.args.num ? app.args.num : 10;
+        this._pages = 0;
+        this._output = null;
+    }
+
+    get usesGithubV4() {
+        return this._usesGithubV4;
+    }
+
+    set usesGithubV4(value) {
+        this._usesGithubV4 = value;
+    }
+
+    get numNeeded() {
+        return this._numNeeded;
+    }
+
+    set numNeeded(value) {
+        this._numNeeded = value;
+    }
+
+    get pages() {
+        return this._pages;
+    }
+
+    set pages(value) {
+        this._pages = value;
+    }
+
+    get output() {
+        return this._output;
+    }
+
+    set output(value) {
+        this._output = value;
+    }
+
+    /**
+     * Asynchronous execution of a command
+     *
+     * @param command {Object} command object
+     * @param params {Object} object which specifies parameters
+     * @returns {Promise<null>}
+     */
+    async execute(command, params) {
         if (this.constructor === Command)
             throw new Error("abstract class");
 
+        this.pages = Math.ceil((this._numNeeded / 100));
+
+        let [c, cmd] = command;
+        if (this.usesGithubV4) {
+            let resObj = {
+                res: {},
+                nodes: []
+            };
+            for (let i = 0; i < this._pages; i++) {
+                let res = await c[`${cmd.name}`]({...params});
+                resObj.res = res;
+                resObj.nodes = resObj.nodes.concat(res.nodes);
+                params.endCursor = `\"${res.pageInfo.endCursor}\"`;
+                params.numNeeded -= 100;
+            }
+            this.output = resObj;
+        }
         this.log();
+        return this.output;
     }
 
+    /**
+     * @todo implement logging
+     */
     log() {
-        console.log(`${this.constructor.name} executed...`);
+        //    console.log(`${this.constructor.name} executed...`);
     }
 }
 
 /**
- *
+ * @inheritDoc
+ * @extends {Command}
  */
 class GetReposCommand extends Command {
 
-    execute() {
-        super.execute();
+    /**
+     * @inheritDoc
+     */
+    constructor() {
+        super(true);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    async execute(command, params) {
 
         let GitHub = require('./GitHub'),
             gh = new GitHub(app.config.token);
 
-        return gh.getRepos(app.args.num ? app.args.num : 10)
+        return super.execute([gh, gh.getRepos], {
+            numNeeded: app.args.num ? app.args.num : 10,
+            endCursor: null
+        });
     }
 }
 
+/**
+ * @inheritDoc
+ * @extends {Command}
+ */
 class GetIssuesCommand extends Command {
 
-    execute() {
-        super.execute();
+    /**
+     * @inheritDoc
+     */
+    constructor() {
+        super();
+        this.usesGithubV4 = true;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    async execute(command, params) {
 
         let GitHub = require('./GitHub'),
             gh = new GitHub(app.config.token);
 
-        return gh.getIssuesFromRepo(app.args.account, app.args.repository, app.args.num ? app.args.num : 10)
+        return super.execute([gh, gh.getIssuesFromRepo], {
+            owner: app.args.account,
+            repo: app.args.repository,
+            numNeeded: app.args.num ? app.args.num : 10,
+            endCursor: null
+        });
     }
 }
 
+/**
+ * @extends {Command}
+ * @inheritDoc
+ */
 class GetPrsCommand extends Command {
 
-    execute() {
-        super.execute();
+    /**
+     * @inheritDoc
+     */
+    constructor() {
+        super(true);
+    }
+
+    /**
+     * @inheritDoc
+     * @returns {Promise<null>}
+     */
+    async execute(command, params) {
 
         let GitHub = require('./GitHub'),
             gh = new GitHub(app.config.token);
 
-        return gh.getPullRequests(app.args.account, app.args.repository, app.args.num ? app.args.num : 10)
-
+        return super.execute([gh, gh.getPullRequests], {
+            owner: app.args.account,
+            repo: app.args.repository,
+            numNeeded: app.args.num ? app.args.num : 10,
+            endCursor: null
+        });
     }
 }
 
+/**
+ * @extends {Command}
+ * @inheritDoc
+ */
 class GetGistsCommand extends Command {
 
-    execute() {
-        super.execute();
+    /**
+     * @inheritDoc
+     */
+    constructor() {
+        super(true);
+    }
+
+    /**
+     * @inheritDoc
+     * @returns {Promise<null>}
+     */
+    async execute(command, params) {
 
         let GitHub = require('./GitHub'),
             gh = new GitHub(app.config.token);
 
-        return gh.getGists(app.args.num ? app.args.num : 10)
+        return super.execute([gh, gh.getGists], {
+            numNeeded: app.args.num ? app.args.num : 10,
+            endCursor: null
+        });
     }
 }
 

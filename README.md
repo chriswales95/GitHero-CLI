@@ -1,5 +1,8 @@
+[![forthebadge](https://forthebadge.com/images/badges/made-with-javascript.svg)](https://forthebadge.com)
+
+![Node.js CI](https://github.com/chriswales95/GitHero-CLI/workflows/Node.js%20CI/badge.svg)
 # GitHero-CLI
-a little project to make a cli for GitHub with NodeJs
+A tool to interact with GitHub without leaving your terminal.
 
 ## Getting started
 To use GitHero, you'll need to provide an API key to the CLI. GitHero only interacts with GitHubs API, so naturally can't do anything without it.

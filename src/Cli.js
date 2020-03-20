@@ -3,7 +3,7 @@
 /**
  * GitHero CLI
  *
- * Christopher Wales
+ * @author Christopher Wales
  */
 
 "use strict";
@@ -14,6 +14,11 @@ const bootstrap = require('./Bootstrap.js');
 
 yargonaut.style('cyan');
 
+/**
+ * Key value pair for commands
+ *
+ * @type {Object}
+ */
 const commands = {
     repos: "repos",
     gists: "gists",
@@ -21,6 +26,12 @@ const commands = {
     prs: "prs"
 };
 
+/**
+ * @description output results to console
+ *
+ * @param columnHeadings {Array<string>} column headings
+ * @param data {Object} data object
+ */
 function outputResults(columnHeadings, data) {
     let chalk = require("chalk");
     let {table, getBorderCharacters} = require('table');
@@ -36,6 +47,11 @@ function outputResults(columnHeadings, data) {
     let output = [];
     output.push(cols);
 
+    if (app.args.raw) {
+        console.log(JSON.stringify(data));
+        return;
+    }
+
     data.forEach(item => {
         let row = [];
         for (let i = 0; i < columnHeadings.length; i++) {
@@ -47,12 +63,26 @@ function outputResults(columnHeadings, data) {
     console.log(table(output, config));
 }
 
+/**
+ * option passed in to specify borderless data output
+ */
 const borderlessOption = ["borderless", {
     alias: 'b',
     type: 'boolean',
     description: 'Output with no borders'
 }];
 
+/**
+ * option passed in to specify raw data output
+ */
+const rawOption = ["raw", {
+    type: 'boolean',
+    description: 'Output raw JSON from GitHub'
+}];
+
+/**
+ *
+ */
 let argv = yargs
     .command(
         'config',
@@ -66,40 +96,38 @@ let argv = yargs
                 })]
         })
     .command('gists [num]', 'get a list of your gists', () => {
-        return yargs.option(...borderlessOption)
+        return [yargs.option(...borderlessOption), yargs.option(...rawOption)]
     })
     .command('repos [num]', 'get a list of your repositories', () => {
-        return yargs.option(...borderlessOption)
+        return [yargs.option(...borderlessOption), yargs.option(...rawOption)]
     })
     .command('issues <account> <repository> [num]', 'get issues from a repository', () => {
-        return yargs.option(...borderlessOption)
+        return [yargs.option(...borderlessOption), yargs.option(...rawOption)]
     })
     .command('prs <account> <repository> [num]', 'get pull requests from a repository', () => {
-        return yargs.option(...borderlessOption)
+        return [yargs.option(...borderlessOption), yargs.option(...rawOption)]
     })
     .help()
     .argv;
 
 /**
- * Global app
+ * @description Global application object
+ *
+ * @global
  * @type {Bootstrap}
  */
-let application = new bootstrap(argv).init();
-global.app = application;
+global.app = new bootstrap(argv).init();
 
 /**
  * Process Arguments
  */
-(() => {
+function processArgs() {
 
-    if (argv._.length > 1) {
+    if (argv._.length > 1 && app) {
         console.error("Only enter one command at a time");
         yargs.showHelp();
         return;
     }
-
-    let GitHub = require('./GitHub');
-    let gh = new GitHub(app.config.token);
 
     switch (app.args._[0]) {
         case commands.issues:
@@ -107,10 +135,12 @@ global.app = application;
             let issues = new GetIssuesCommand().execute();
 
             issues.then(result => {
-                result.forEach(res => {
-                    res.authorName = res.author.login;
+                result.nodes.forEach(res => {
+                    res.authorName = res.node.author ? res.node.author.login : "none";
+                    res.title = res.node.title;
+                    res.createdAt = res.node.createdAt;
                 });
-                outputResults(["title", "authorName", "createdAt"], result);
+                outputResults(["title", "authorName", "createdAt"], result.nodes);
             });
             break;
 
@@ -119,7 +149,12 @@ global.app = application;
             let repos = new GetReposCommand().execute();
 
             repos.then(result => {
-                outputResults(["name", "sshUrl", "updatedAt"], result);
+                result.nodes.forEach(res => {
+                    res.name = res.node.name;
+                    res.sshUrl = res.node.sshUrl;
+                    res.updatedAt = res.node.updatedAt;
+                });
+                outputResults(["name", "sshUrl", "updatedAt"], result.nodes);
             });
             break;
 
@@ -128,7 +163,12 @@ global.app = application;
             let gists = new GetGistsCommand().execute();
 
             gists.then(result => {
-                outputResults(["description", "url", "isPublic"], result);
+                result.nodes.forEach(res => {
+                    res.description = res.node.description;
+                    res.url = res.node.url;
+                    res.isPublic = res.node.isPublic;
+                });
+                outputResults(["description", "url", "isPublic"], result.nodes);
             });
             break;
 
@@ -137,15 +177,22 @@ global.app = application;
             let prs = new GetPrsCommand().execute();
 
             prs.then(result => {
-                result.forEach(res => {
-                    res.authorName = res.author.login;
+                result.nodes.forEach(res => {
+                    res.authorName = res.node.author ? res.node.author.login : "none";
+                    res.state = res.node.state.toLowerCase();
+                    res.title = res.node.title;
                 });
-                outputResults(["title", "authorName", "updatedAt"], result);
+                outputResults(["title", "authorName", "state"], result.nodes);
             });
-
             break;
 
         default:
             yargs.showHelp();
     }
-})();
+}
+
+// Disable this bit when running tests
+if (!global.test)
+    processArgs();
+
+module.exports = {outputResults, processArgs};

@@ -14,7 +14,7 @@ it('GetGists should fail without a token', async () => {
 });
 
 it('getPullRequests should fail without a token', async () => {
-    await expect(git.getPullRequests("chrisales95", "GitHero-CLI", 1))
+    await expect(git.getPullRequests("chrisales95", "GitHero-CLI", 1, 0))
         .rejects
         .toThrow('Request failed with status code 401');
 });

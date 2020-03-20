@@ -1,10 +1,10 @@
 {
   "name": "gist_cli",
   "author": "Christopher Wales",
-  "version": "1.0.0-beta-1",
+  "version": "0.0.0-alpha.1",
   "scripts": {
     "start": "src/Cli.js",
-    "test": "jest",
+    "test": "jest --coverage",
     "docs": "jsdoc src && serve out"
   },
   "dependencies": {
@@ -13,12 +13,13 @@
     "process": "latest",
     "table": "^5.4.6",
     "yargonaut": "^1.1.4",
-    "yargs": "^15.1.0"
+    "yargs": "^15.3.1"
   },
   "bin": {
     "githero": "src/Cli.js"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
     "jest": "^25.1.0",
     "jsdoc": "^3.6.3",
     "serve": "^11.3.0"
