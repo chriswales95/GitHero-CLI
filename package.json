@@ -13,7 +13,7 @@
     "process": "latest",
     "table": "^5.4.6",
     "yargonaut": "^1.1.4",
-    "yargs": "^15.1.0"
+    "yargs": "^15.3.1"
   },
   "bin": {
     "githero": "src/Cli.js"
