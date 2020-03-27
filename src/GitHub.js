@@ -229,7 +229,6 @@ class GitHub {
 
         if (!options.username) {
             console.log("Githero needs your username for this feature\nplease supply your username via the configuration command\ngithero config --username=<username>");
-            process.exit(0);
         }
         let response = await require('axios').default.get(' https://api.github.com/notifications', {
             auth: {
