@@ -23,7 +23,8 @@ const commands = {
     repos: "repos",
     gists: "gists",
     issues: "issues",
-    prs: "prs"
+    prs: "prs",
+    notifications: "notifications"
 };
 
 /**
@@ -92,6 +93,11 @@ let argv = yargs
                 yargs.option('token', {
                     alias: 't',
                     describe: 'Store your api key for ease of use',
+                    type: 'string'
+                }),
+                yargs.option('username', {
+                    alias: 'u',
+                    describe: 'Store your username',
                     type: 'string'
                 })]
         })
@@ -183,6 +189,24 @@ function processArgs() {
                     res.title = res.node.title;
                 });
                 outputResults(["title", "authorName", "state"], result.nodes);
+            });
+            break;
+
+        case commands.notifications:
+            let {GetNotificationsCommand} = require('./Command');
+            let notifications = new GetNotificationsCommand().execute();
+
+            notifications.then(result => {
+                if (result.data.length === 0) {
+                    console.log("No notifications! 🎉");
+                    return;
+                }
+                result.data.forEach(notification => {
+                    notification.title = notification.subject.title;
+                    notification.url = notification.subject.url;
+                    notification.repo = notification.repository.full_name;
+                });
+                outputResults(["repo", "title", "url"], result.data);
             });
             break;
 

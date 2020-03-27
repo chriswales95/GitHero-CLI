@@ -127,6 +127,12 @@ class Bootstrap {
             this.config.token = this.args.token || this.args.t;
             updateConfig = true;
         }
+
+        if (args._.includes('config') && (this.args.username || this.args.u)) {
+            this.config.username = this.args.username || this.args.u;
+            updateConfig = true;
+        }
+
         if (updateConfig) {
             this.storeConfig(this.config);
         }
