@@ -218,6 +218,26 @@ class GitHub {
             throw new Error('Was unable to fetch details on repository');
         }
     }
+
+    /**
+     * Get notifications for the user
+     *
+     * @param options
+     * @returns {Promise<T[]>}
+     */
+    async getNotifications(options) {
+
+        if (!options.username) {
+            console.log("Githero needs your username for this feature\nplease supply your username via the configuration command\ngithero config --username=<username>");
+        }
+        let response = await require('axios').default.get(' https://api.github.com/notifications', {
+            auth: {
+                username: this.username,
+                password: this.token
+            }
+        });
+        return response;
+    }
 }
 
 module.exports = GitHub;

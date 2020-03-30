@@ -76,7 +76,11 @@ class Command {
                 params.numNeeded -= 100;
             }
             this.output = resObj;
+        } else {
+            let res = await c[`${cmd.name}`]({...params});
+            this.output = res;
         }
+
         this.log();
         return this.output;
     }
@@ -208,4 +212,30 @@ class GetGistsCommand extends Command {
     }
 }
 
-module.exports = {GetReposCommand, GetIssuesCommand, GetPrsCommand, GetGistsCommand};
+/**
+ * @extends {Command}
+ * @inheritDoc
+ */
+class GetNotificationsCommand extends Command {
+
+    /**
+     * @inheritDoc
+     */
+    constructor() {
+        super(false);
+    }
+
+    /**
+     * @inheritDoc
+     * @returns {Promise<null>}
+     */
+    async execute(command, params) {
+
+        let GitHub = require('./GitHub'),
+            gh = new GitHub(app.config.token);
+
+        return super.execute([gh, gh.getNotifications], {username: app.config.username});
+    }
+}
+
+module.exports = {GetReposCommand, GetIssuesCommand, GetPrsCommand, GetGistsCommand, GetNotificationsCommand};
