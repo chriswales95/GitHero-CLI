@@ -113,6 +113,9 @@ let argv = yargs
     .command('prs <account> <repository> [num]', 'get pull requests from a repository', () => {
         return [yargs.option(...borderlessOption), yargs.option(...rawOption)]
     })
+    .command('notifications', 'Display your unread notifications', () => {
+        return [yargs.option(...borderlessOption), yargs.option(...rawOption)]
+    })
     .help()
     .argv;
 
