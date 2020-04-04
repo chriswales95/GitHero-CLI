@@ -38,8 +38,13 @@ function outputResults(columnHeadings, data) {
     let {table, getBorderCharacters} = require('table');
 
     let config = {
-        border: app.args.b === true ? getBorderCharacters('void') : getBorderCharacters('ramac')
+        border: app.args.format === "borderless" ? getBorderCharacters('void') : getBorderCharacters('ramac')
     };
+
+    if (app.args.format === "json") {
+        console.log(JSON.stringify(data));
+        return;
+    }
 
     let cols = columnHeadings.map(e => {
         return chalk.cyan.bold(e);
@@ -47,11 +52,6 @@ function outputResults(columnHeadings, data) {
 
     let output = [];
     output.push(cols);
-
-    if (app.args.raw) {
-        console.log(JSON.stringify(data));
-        return;
-    }
 
     data.forEach(item => {
         let row = [];
@@ -65,20 +65,11 @@ function outputResults(columnHeadings, data) {
 }
 
 /**
- * option passed in to specify borderless data output
- */
-const borderlessOption = ["borderless", {
-    alias: 'b',
-    type: 'boolean',
-    description: 'Output with no borders'
-}];
-
-/**
  * option passed in to specify raw data output
  */
-const rawOption = ["raw", {
-    type: 'boolean',
-    description: 'Output raw JSON from GitHub'
+const formatOption = ["format", {
+    type: 'string',
+    description: 'Change the formatted output to a supported format'
 }];
 
 /**
@@ -102,19 +93,19 @@ let argv = yargs
                 })]
         })
     .command('gists [num]', 'get a list of your gists', () => {
-        return [yargs.option(...borderlessOption), yargs.option(...rawOption)]
+        return [yargs.option(...formatOption)]
     })
     .command('repos [num]', 'get a list of your repositories', () => {
-        return [yargs.option(...borderlessOption), yargs.option(...rawOption)]
+        return [yargs.option(...formatOption)]
     })
     .command('issues <account> <repository> [num]', 'get issues from a repository', () => {
-        return [yargs.option(...borderlessOption), yargs.option(...rawOption)]
+        return [yargs.option(...formatOption)]
     })
     .command('prs <account> <repository> [num]', 'get pull requests from a repository', () => {
-        return [yargs.option(...borderlessOption), yargs.option(...rawOption)]
+        return [yargs.option(...formatOption)]
     })
     .command('notifications', 'Display your unread notifications', () => {
-        return [yargs.option(...borderlessOption), yargs.option(...rawOption)]
+        return [yargs.option(...formatOption)]
     })
     .help()
     .argv;
