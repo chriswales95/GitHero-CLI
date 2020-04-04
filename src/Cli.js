@@ -61,15 +61,23 @@ function outputResults(columnHeadings, data) {
         output.push(row)
     });
 
+    if (app.args.format === "csv") {
+        console.log(columnHeadings.join(','));
+        output.splice(0, 1); // get rid of the headings with the formatting
+        output.forEach(row => {
+            console.log(row.join(','))
+        });
+        return;
+    }
     console.log(table(output, config));
 }
 
 /**
- * option passed in to specify raw data output
+ * option passed in to specify data output
  */
 const formatOption = ["format", {
     type: 'string',
-    description: 'Change the formatted output to a supported format'
+    description: 'Change the formatted output to a supported format. Accepted formats: borderless, json, csv'
 }];
 
 /**
