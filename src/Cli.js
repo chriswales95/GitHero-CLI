@@ -37,15 +37,7 @@ function outputResults(columnHeadings, data) {
     let chalk = require("chalk");
     let {table, getBorderCharacters} = require('table');
 
-    let config = {
-        border: app.args.format === "borderless" ? getBorderCharacters('void') : getBorderCharacters('ramac')
-    };
-
-    if (app.args.format === "json") {
-        console.log(JSON.stringify(data));
-        return;
-    }
-
+    let config = {};
     let cols = columnHeadings.map(e => {
         return chalk.cyan.bold(e);
     });
@@ -61,13 +53,28 @@ function outputResults(columnHeadings, data) {
         output.push(row)
     });
 
-    if (app.args.format === "csv") {
-        console.log(columnHeadings.join(','));
-        output.splice(0, 1); // get rid of the headings with the formatting
-        output.forEach(row => {
-            console.log(row.join(','))
-        });
-        return;
+    /**
+     * Allowed formats: csv, json, borderless
+     */
+    if (app.args.format) {
+        switch (app.args.format) {
+            case "json":
+                console.log(JSON.stringify(data));
+                return;
+            case "csv":
+                console.log(columnHeadings.join(','));
+                output.splice(0, 1); // get rid of the headings with the formatting
+                output.forEach(row => {
+                    console.log(row.join(','))
+                });
+                return;
+            case "borderless":
+                config = {border: app.args.format === "borderless" ? getBorderCharacters('void') : getBorderCharacters('ramac')};
+                break;
+            default:
+                console.error(chalk.red("Format parameter doesn't match the allowed format types!"));
+                return;
+        }
     }
     console.log(table(output, config));
 }
