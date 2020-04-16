@@ -92,11 +92,6 @@ class Bootstrap {
      */
     init() {
 
-        // Check OS
-        if (this.os !== 'darwin') {
-            console.warn('Warning: githero has not been tested outside of Mac OS but give it a go');
-        }
-
         // check for config
         try {
             if (!fs.existsSync(`${os.homedir()}/.githero.json`)) {
