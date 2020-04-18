@@ -32,6 +32,14 @@ class Bootstrap {
     }
 
     /**
+     *
+     * @returns {string}
+     */
+    get configurationStorage() {
+        return `${os.homedir()}/.githero.json`;
+    }
+
+    /**
      * Return logging level
      *
      * @returns {string}
@@ -43,34 +51,34 @@ class Bootstrap {
     /**
      * Set logging level
      *
-     * @param value
+     * @param newLoggingLevel
      */
-    set loggingLevel(value) {
-        this._loggingLevel = value;
+    set loggingLevel(newLoggingLevel) {
+        this._loggingLevel = newLoggingLevel;
     }
 
     /**
      * Set arguments
      *
-     * @param value
+     * @param newArgsValue
      */
-    set args(value) {
-        this._args = value;
+    set args(newArgsValue) {
+        this._args = newArgsValue;
     }
 
     /**
      * Set config
      *
-     * @param value
+     * @param newConfigurationObject
      */
-    set config(value) {
-        this._config = value;
+    set config(newConfigurationObject) {
+        this._config = newConfigurationObject;
     }
 
     /**
      * Get config
      *
-     * @returns {{}}
+     * @returns {Object}
      */
     get config() {
         return this._config;
@@ -94,7 +102,7 @@ class Bootstrap {
 
         // check for config
         try {
-            if (!fs.existsSync(`${os.homedir()}/.githero.json`)) {
+            if (!fs.existsSync(this.configurationStorage)) {
                 // get essential details e.g. api key or we can't do anything
                 console.log("\nHold on!\n\nTo continue, you'll need to provide GitHero with an API key from Github! We can't do anything otherwise ¯\\_(ツ)_/¯");
                 console.log("https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line");
@@ -102,7 +110,7 @@ class Bootstrap {
                 this.storeConfig(this._config);
             } else {
                 // read config
-                this.config = JSON.parse(fs.readFileSync(`${os.homedir()}/.githero.json`, 'utf8'));
+                this.config = JSON.parse(fs.readFileSync(this.configurationStorage, 'utf8'));
             }
         } catch (e) {
             console.trace(e);
@@ -139,7 +147,7 @@ class Bootstrap {
      * @param config {Object} config object
      */
     storeConfig(config) {
-        fs.writeFile(`${os.homedir()}/.githero.json`, JSON.stringify(config), function (err) {
+        fs.writeFile(this.configurationStorage, JSON.stringify(config), function (err) {
             if (err) {
                 console.log('There has been an error saving your configuration data.');
                 console.log(err.message);
