@@ -37,7 +37,9 @@ function outputResults(columnHeadings, data) {
     let chalk = require("chalk");
     let {table, getBorderCharacters} = require('table');
 
-    let config = {};
+    let config = {
+        border: getBorderCharacters('ramac')
+    };
     let cols = columnHeadings.map(e => {
         return chalk.cyan.bold(e);
     });
@@ -69,7 +71,7 @@ function outputResults(columnHeadings, data) {
                 });
                 return;
             case "borderless":
-                config = {border: app.args.format === "borderless" ? getBorderCharacters('void') : getBorderCharacters('ramac')};
+                config.border = getBorderCharacters('void');
                 break;
             default:
                 console.error(chalk.red("Format parameter doesn't match the allowed format types!"));
@@ -87,9 +89,6 @@ const formatOption = ["format", {
     description: 'Change the formatted output to a supported format. Accepted formats: borderless, json, csv'
 }];
 
-/**
- *
- */
 let argv = yargs
     .command(
         'config',
