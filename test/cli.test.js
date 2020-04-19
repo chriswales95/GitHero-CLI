@@ -20,7 +20,7 @@ let app = {
 
 global.app = app;
 
-let {outputResults} = require('../src/Cli');
+let {outputResults} = require('../src');
 
 test('Test cli is called', () => {
 

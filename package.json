@@ -2,8 +2,10 @@
   "name": "githero",
   "author": "Christopher Wales",
   "version": "1.0.0-alpha.1",
+  "main": "src/index.js",
+  "homepage": "https://github.com/chriswales95/GitHero-CLI",
   "scripts": {
-    "start": "src/Cli.js",
+    "start": "src/index.js",
     "test": "jest --coverage",
     "docs": "jsdoc src && serve out"
   },
@@ -16,7 +18,7 @@
     "yargs": "^15.3.1"
   },
   "bin": {
-    "githero": "src/Cli.js"
+    "githero": "src/index.js"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.8.3",
