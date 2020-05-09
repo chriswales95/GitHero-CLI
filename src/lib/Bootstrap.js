@@ -104,8 +104,6 @@ class Bootstrap {
         try {
             if (!fs.existsSync(this.configurationStorage)) {
                 // get essential details e.g. api key or we can't do anything
-                console.log("\nHold on!\n\nTo continue, you'll need to provide GitHero with an API key from Github! We can't do anything otherwise ¯\\_(ツ)_/¯");
-                console.log("https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line");
                 this.config = {};
                 this.storeConfig(this._config);
             } else {
@@ -122,7 +120,8 @@ class Bootstrap {
     /**
      * Check arguments for config
      *
-     * @param args {Object} argument object
+     * @param args
+     * @returns {boolean}
      */
     checkArgs(args) {
         let updateConfig = false;
@@ -139,6 +138,8 @@ class Bootstrap {
         if (updateConfig) {
             this.storeConfig(this.config);
         }
+
+        return updateConfig
     }
 
     /**

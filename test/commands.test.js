@@ -1,6 +1,6 @@
 "use strict";
 
-let {GetReposCommand, GetIssuesCommand, GetPrsCommand, GetGistsCommand, GetNotificationsCommand} = require("../src/Command");
+let {GetReposCommand, GetIssuesCommand, GetPrsCommand, GetGistsCommand, GetNotificationsCommand} = require("../src/lib/Command");
 
 global.app = {
     args: {
