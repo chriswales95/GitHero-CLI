@@ -10,7 +10,8 @@
 
 const yargonaut = require('yargonaut');
 const yargs = require('yargs');
-const bootstrap = require('./Bootstrap.js');
+const bootstrap = require('./lib/Bootstrap.js');
+const command = require('./lib/Command');
 
 yargonaut.style('cyan');
 
@@ -143,10 +144,18 @@ function processArgs() {
         return;
     }
 
+    if (app.config) {
+        if (!(app.config.token)) {
+            console.log("\nHold on!\n\nTo continue, you'll need to provide GitHero with an API key from Github! We can't do anything otherwise ¯\\_(ツ)_/¯");
+            console.log("https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line");
+            return;
+        }
+    }
+
+
     switch (app.args._[0]) {
         case commands.issues:
-            let {GetIssuesCommand} = require('./Command');
-            let issues = new GetIssuesCommand().execute();
+            let issues = new command.GetIssuesCommand().execute();
 
             issues.then(result => {
                 result.nodes.forEach(res => {
@@ -159,8 +168,7 @@ function processArgs() {
             break;
 
         case commands.repos:
-            let {GetReposCommand} = require('./Command');
-            let repos = new GetReposCommand().execute();
+            let repos = new command.GetReposCommand().execute();
 
             repos.then(result => {
                 result.nodes.forEach(res => {
@@ -173,8 +181,7 @@ function processArgs() {
             break;
 
         case commands.gists:
-            let {GetGistsCommand} = require('./Command');
-            let gists = new GetGistsCommand().execute();
+            let gists = new command.GetGistsCommand().execute();
 
             gists.then(result => {
                 result.nodes.forEach(res => {
@@ -187,8 +194,7 @@ function processArgs() {
             break;
 
         case commands.prs:
-            let {GetPrsCommand} = require('./Command');
-            let prs = new GetPrsCommand().execute();
+            let prs = new command.GetPrsCommand().execute();
 
             prs.then(result => {
                 result.nodes.forEach(res => {
@@ -201,8 +207,7 @@ function processArgs() {
             break;
 
         case commands.notifications:
-            let {GetNotificationsCommand} = require('./Command');
-            let notifications = new GetNotificationsCommand().execute();
+            let notifications = new command.GetNotificationsCommand().execute();
 
             notifications.then(result => {
                 if (result.data.length === 0) {
@@ -219,7 +224,10 @@ function processArgs() {
             break;
 
         default:
-            yargs.showHelp();
+            // if not being required as a module, show help.
+            if (require.main === module) {
+                yargs.showHelp();
+            }
     }
 }
 
@@ -227,4 +235,4 @@ function processArgs() {
 if (!global.test)
     processArgs();
 
-module.exports = {outputResults, processArgs};
+module.exports = {outputResults, processArgs, command};
