@@ -231,8 +231,8 @@ function processArgs() {
     }
 }
 
-// Disable this bit when running tests
-if (!global.test)
+// Only process args if not required as a module
+if (require.main === module)
     processArgs();
 
 module.exports = {outputResults, processArgs, command};
