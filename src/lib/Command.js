@@ -72,8 +72,10 @@ class Command {
                 let res = await c[`${cmd.name}`]({...params});
                 resObj.res = res;
                 resObj.nodes = resObj.nodes.concat(res.nodes);
-                params.endCursor = `\"${res.pageInfo.endCursor}\"`;
+                params.endCursor = res.pageInfo.endCursor ? `\"${res.pageInfo.endCursor}\"` : '';
                 params.numNeeded -= 100;
+                if (params.endCursor === "")
+                    break;
             }
             this.output = resObj;
         } else {
