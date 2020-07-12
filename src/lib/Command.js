@@ -72,10 +72,12 @@ class Command {
                 let res = await c[`${cmd.name}`]({...params});
                 resObj.res = res;
                 resObj.nodes = resObj.nodes.concat(res.nodes);
-                params.endCursor = res.pageInfo.endCursor ? `\"${res.pageInfo.endCursor}\"` : '';
-                params.numNeeded -= 100;
-                if (params.endCursor === "")
-                    break;
+                if (this.pages > 1) {
+                    params.endCursor = res.pageInfo.endCursor ? `\"${res.pageInfo.endCursor}\"` : '';
+                    params.numNeeded -= 100;
+                    if (params.endCursor === "")
+                        break;
+                }
             }
             this.output = resObj;
         } else {
@@ -240,4 +242,29 @@ class GetNotificationsCommand extends Command {
     }
 }
 
-module.exports = {GetReposCommand, GetIssuesCommand, GetPrsCommand, GetGistsCommand, GetNotificationsCommand};
+class GetRepositorySummaryCommand extends Command {
+    constructor() {
+        super(true);
+    }
+
+    async execute(command, params) {
+
+        let GitHub = require('./GitHub'),
+            gh = new GitHub(app.config.token);
+
+        return super.execute([gh, gh.getRepositorySummary], {
+            owner: app.args.account,
+            repo: app.args.repository
+        });
+    }
+
+}
+
+module.exports = {
+    GetReposCommand,
+    GetIssuesCommand,
+    GetPrsCommand,
+    GetGistsCommand,
+    GetNotificationsCommand,
+    GetRepositorySummaryCommand
+};
