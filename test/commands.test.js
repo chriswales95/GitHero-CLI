@@ -1,6 +1,6 @@
 "use strict";
 
-let {GetReposCommand, GetIssuesCommand, GetPrsCommand, GetGistsCommand, GetNotificationsCommand} = require("../src/lib/Command");
+let {GetReposCommand, GetIssuesCommand, GetPrsCommand, GetGistsCommand, GetNotificationsCommand, GetRepositorySummaryCommand} = require("../src/lib/Command");
 
 global.app = {
     args: {
@@ -39,6 +39,13 @@ it('GetReposCommand should fail', async () => {
 
 it('GetNotificationsCommand should fail without token', async () => {
     let command = new GetNotificationsCommand();
+    await expect(command.execute())
+        .rejects
+        .toThrow();
+});
+
+it('GetNotificationsCommand should fail without token', async () => {
+    let command = new GetRepositorySummaryCommand();
     await expect(command.execute())
         .rejects
         .toThrow();

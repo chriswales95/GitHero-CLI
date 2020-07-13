@@ -247,6 +247,12 @@ class GitHub {
      */
     async getRepositorySummary(options) {
 
+        if (options.hasOwnProperty('owner') === false)
+            throw new Error('Missing required option: owner')
+
+        if (options.hasOwnProperty('name') === false)
+            throw new Error('Missing required option: name')
+
         let response = await require('axios').default.post("https://api.github.com/graphql", {
             query: "{\n" +
                 `  repository(owner: \"${options.owner}\", name: \"${options.repo}\") {\n` +
