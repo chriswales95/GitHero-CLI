@@ -238,6 +238,58 @@ class GitHub {
         });
         return response;
     }
+
+    /**
+     * Get a summary of a repository
+     *
+     * @param options
+     * @returns {Promise<T[]>}
+     */
+    async getRepositorySummary(options) {
+
+        let response = await require('axios').default.post("https://api.github.com/graphql", {
+            query: "{\n" +
+                `  repository(owner: \"${options.owner}\", name: \"${options.repo}\") {\n` +
+                "nameWithOwner" +
+                "    description\n" +
+                "    createdAt\n" +
+                "    diskUsage\n" +
+                "    homepageUrl\n" +
+                "    sshUrl\n" +
+                "    url\n" +
+                "    stargazers {\n" +
+                "      totalCount\n" +
+                "    }\n" +
+                "    isTemplate\n" +
+                "    isPrivate\n" +
+                "    isMirror\n" +
+                "    isLocked\n" +
+                "    isFork\n" +
+                "    isArchived\n" +
+                "    isDisabled\n" +
+                "    hasWikiEnabled\n" +
+                "    forkCount\n" +
+                "    licenseInfo {\n" +
+                "      nickname\n" +
+                "    }\n" +
+                "    hasProjectsEnabled\n" +
+                "    issues(states: OPEN) {\n" +
+                "      totalCount\n" +
+                "    }\n" +
+                "    hasIssuesEnabled\n" +
+                "    id\n" +
+                "    pullRequests(states: OPEN) {\n" +
+                "      totalCount\n" +
+                "    }\n" +
+                "    pushedAt\n" +
+                "    updatedAt\n" +
+                "  }\n" +
+                "}\n" +
+                "\n"
+        }, {headers: {Authorization: "Bearer " + this.token}});
+
+        return response;
+    }
 }
 
 module.exports = GitHub;

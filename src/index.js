@@ -25,36 +25,48 @@ const commands = {
     gists: "gists",
     issues: "issues",
     prs: "prs",
-    notifications: "notifications"
+    notifications: "notifications",
+    rs: "rs"
 };
 
 /**
  * @description output results to console
  *
- * @param columnHeadings {Array<string>} column headings
+ * @param options {Object} options
  * @param data {Object} data object
  */
-function outputResults(columnHeadings, data) {
+function outputResults(options, data) {
     let chalk = require("chalk");
     let {table, getBorderCharacters} = require('table');
 
     let config = {
         border: getBorderCharacters('ramac')
     };
-    let cols = columnHeadings.map(e => {
-        return chalk.cyan.bold(e);
-    });
 
     let output = [];
-    output.push(cols);
+    if (options.usingColumnHeadings !== true) {
 
-    data.forEach(item => {
-        let row = [];
-        for (let i = 0; i < columnHeadings.length; i++) {
-            row.push(item[columnHeadings[i]]);
-        }
-        output.push(row)
-    });
+        let cols = options.rowHeadings.map(e => {
+            return chalk.cyan.bold(e);
+        });
+
+        output.push(cols);
+
+        data.forEach(item => {
+            let row = [];
+            for (let i = 0; i < options.rowHeadings.length; i++) {
+                row.push(item[options.rowHeadings[i]]);
+            }
+            output.push(row)
+        });
+    } else {
+
+        data.forEach(item => {
+            for (let [key, val] of Object.entries(item)) {
+                output.push([chalk.cyan.bold(key), val]);
+            }
+        });
+    }
 
     /**
      * Allowed formats: csv, json, borderless
@@ -65,8 +77,10 @@ function outputResults(columnHeadings, data) {
                 console.log(JSON.stringify(data));
                 return;
             case "csv":
-                console.log(columnHeadings.join(','));
-                output.splice(0, 1); // get rid of the headings with the formatting
+                if (options.usingColumnHeadings !== true) {
+                    console.log(options.rowHeadings.join(','));
+                    output.splice(0, 1); // get rid of the headings with the formatting
+                }
                 output.forEach(row => {
                     console.log(row.join(','))
                 });
@@ -122,6 +136,9 @@ let argv = yargs
     .command('notifications', 'Display your unread notifications', () => {
         return [yargs.option(...formatOption)]
     })
+    .command('rs <account> <repository>', 'Display a summary about a repository', () => {
+        return [yargs.option(...formatOption)]
+    })
     .help()
     .argv;
 
@@ -152,7 +169,6 @@ function processArgs() {
         }
     }
 
-
     switch (app.args._[0]) {
         case commands.issues:
             let issues = new command.GetIssuesCommand().execute();
@@ -163,7 +179,7 @@ function processArgs() {
                     res.title = res.node.title;
                     res.createdAt = res.node.createdAt;
                 });
-                outputResults(["title", "authorName", "createdAt"], result.nodes);
+                outputResults({rowHeadings: ["title", "authorName", "createdAt"]}, result.nodes);
             });
             break;
 
@@ -176,7 +192,7 @@ function processArgs() {
                     res.sshUrl = res.node.sshUrl;
                     res.updatedAt = res.node.updatedAt;
                 });
-                outputResults(["name", "sshUrl", "updatedAt"], result.nodes);
+                outputResults({rowHeadings: ["name", "sshUrl", "updatedAt"]}, result.nodes);
             });
             break;
 
@@ -189,7 +205,7 @@ function processArgs() {
                     res.url = res.node.url;
                     res.isPublic = res.node.isPublic;
                 });
-                outputResults(["description", "url", "isPublic"], result.nodes);
+                outputResults({rowHeadings: ["description", "url", "isPublic"]}, result.nodes);
             });
             break;
 
@@ -202,7 +218,7 @@ function processArgs() {
                     res.state = res.node.state.toLowerCase();
                     res.title = res.node.title;
                 });
-                outputResults(["title", "authorName", "state"], result.nodes);
+                outputResults({rowHeadings: ["title", "authorName", "state"]}, result.nodes);
             });
             break;
 
@@ -219,7 +235,41 @@ function processArgs() {
                     notification.url = notification.subject.url;
                     notification.repo = notification.repository.full_name;
                 });
-                outputResults(["repo", "title", "url"], result.data);
+                outputResults({rowHeadings: ["repo", "title", "url"]}, result.data);
+            });
+            break;
+
+        case commands.rs:
+            const summary = new command.GetRepositorySummaryCommand().execute();
+            summary.then(data => {
+                const summaryData = data.res.data.data.repository;
+                const errors = data.res.data.errors;
+                if (errors) {
+                    console.log(errors[0].message);
+                    return;
+                }
+
+                let tableRows = [];
+                // outputResults expects an array so let's give it one
+                for (let [key, value] of Object.entries(summaryData)) {
+
+                    if (typeof value === 'object' && value !== null) {
+                        if (value.hasOwnProperty('totalCount'))
+                            value = value.totalCount ? value.totalCount : 'no data';
+
+                        if (value.hasOwnProperty('nickname'))
+                            value = value.nickname ? value.nickname : 'no data';
+                    }
+
+                    if (value == null || value === '')
+                        value = 'no data';
+
+                    // computed property syntax: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#Computed_property_names
+                    tableRows.push({[key]: value});
+                }
+                // console.log(array);
+                outputResults({usingColumnHeadings: true}, tableRows)
+
             });
             break;
 

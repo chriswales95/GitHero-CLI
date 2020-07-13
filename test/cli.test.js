@@ -24,12 +24,12 @@ let {outputResults} = require('../src');
 
 test('Test cli is called', () => {
 
-    const testFunction = jest.fn(outputResults(["col"], data));
+    const testFunction = jest.fn(outputResults({rowHeadings: ["col"]}, data));
     testFunction();
     expect(testFunction).toHaveBeenCalledTimes(1);
 });
 
 test('Cli should return nothing', () => {
     global.test = true;
-    expect(outputResults(["col"], data)).toBeUndefined();
+    expect(outputResults({rowHeadings: ["col"]}, data)).toBeUndefined();
 });
