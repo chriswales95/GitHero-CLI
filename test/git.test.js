@@ -24,3 +24,9 @@ it('getIssuesFromRepo should fail without a token', async () => {
         .rejects
         .toThrow('Request failed with status code 401');
 });
+
+it('getRepositorySummary should fail if missing name option', async () => {
+    await expect(git.getRepositorySummary({name: "chrisales95"}))
+        .rejects
+        .toThrow('Missing required option: owner');
+});
