@@ -32,6 +32,7 @@ class Bootstrap {
     }
 
     /**
+     * Returns configuration storage directory
      *
      * @returns {string}
      */

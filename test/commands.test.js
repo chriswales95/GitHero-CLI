@@ -1,6 +1,6 @@
 "use strict";
 
-let {GetReposCommand, GetIssuesCommand, GetPrsCommand, GetGistsCommand, GetNotificationsCommand, GetRepositorySummaryCommand} = require("../src/lib/Command");
+let {Command, GetReposCommand, GetIssuesCommand, GetPrsCommand, GetGistsCommand, GetNotificationsCommand, GetRepositorySummaryCommand} = require("../src/lib/Command");
 
 global.app = {
     args: {
@@ -9,44 +9,62 @@ global.app = {
     config: {}
 };
 
-it('GetReposCommand should fail', async () => {
-    let command = new GetReposCommand();
-    await expect(command.execute())
-        .rejects
-        .toThrow();
+it('Command execute function should not be able to be run', function () {
+    try {
+        let command = new Command();
+    } catch (e) {
+        expect(e.message).toBe('Cannot instantiate abstract class');
+    }
 });
 
-it('GetGistsCommand should fail', async () => {
-    let command = new GetGistsCommand();
-    await expect(command.execute())
-        .rejects
-        .toThrow();
+it('GetGistsCommand should fail without token', () => {
+    try {
+        let command = new GetGistsCommand();
+        command.execute();
+    } catch (e) {
+        expect(e.message).toBe('Token is missing from the configuration')
+    }
+
 });
 
-it('GetIssuesCommand should fail', async () => {
-    let command = new GetIssuesCommand();
-    await expect(command.execute())
-        .rejects
-        .toThrow();
+it('GetIssuesCommand should fail without token', () => {
+    try {
+        let command = new GetIssuesCommand();
+        command.execute();
+    } catch (e) {
+        expect(e.message).toBe('Token is missing from the configuration')
+    }
 });
 
-it('GetReposCommand should fail', async () => {
+it('GetReposCommand should fail without token', () => {
+    try {
+        let command = new GetReposCommand();
+        command.execute();
+    } catch (e) {
+        expect(e.message).toBe('Token is missing from the configuration')
+    }
+});
+
+it('GetNotificationsCommand should fail without token', () => {
+    try {
+        let command = new GetNotificationsCommand();
+        command.execute();
+    } catch (e) {
+        expect(e.message).toBe('Token is missing from the configuration')
+    }
+});
+
+it('GetRepositorySummaryCommand should fail without token', async () => {
+    try {
+        let command = new GetRepositorySummaryCommand();
+        await command.execute();
+    } catch (e) {
+        expect(e.message).toBe('Token is missing from the configuration')
+    }
+});
+
+it('GetPrsCommand should fail without token', async () => {
     let command = new GetPrsCommand();
-    await expect(command.execute())
-        .rejects
-        .toThrow();
-});
-
-it('GetNotificationsCommand should fail without token', async () => {
-    let command = new GetNotificationsCommand();
-    await expect(command.execute())
-        .rejects
-        .toThrow();
-});
-
-it('GetNotificationsCommand should fail without token', async () => {
-    let command = new GetRepositorySummaryCommand();
-    await expect(command.execute())
-        .rejects
-        .toThrow();
+    let result = await command.execute();
+    expect(result.message).toBe('Token is missing from the configuration')
 });

@@ -60,7 +60,6 @@ function outputResults(options, data) {
             output.push(row)
         });
     } else {
-
         data.forEach(item => {
             for (let [key, val] of Object.entries(item)) {
                 output.push([chalk.cyan.bold(key), val]);
@@ -155,17 +154,15 @@ global.app = new bootstrap(argv).init();
  */
 function processArgs() {
 
-    if (argv._.length > 1 && app) {
-        console.error("Only enter one command at a time");
-        yargs.showHelp();
-        return;
+    if (app.args._.length > 1 && app) {
+        throw new Error("Only enter one command at a time");
     }
 
     if (app.config) {
         if (!(app.config.token)) {
-            console.log("\nHold on!\n\nTo continue, you'll need to provide GitHero with an API key from Github! We can't do anything otherwise ¯\\_(ツ)_/¯");
-            console.log("https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line");
-            return;
+            console.error("\nHold on!\n\nTo continue, you'll need to provide GitHero with an API key from Github! We can't do anything otherwise ¯\\_(ツ)_/¯");
+            console.error("https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line");
+            process.exit(1);
         }
     }
 
@@ -200,7 +197,8 @@ function processArgs() {
             let gists = new command.GetGistsCommand().execute();
 
             gists.then(result => {
-                result.nodes.forEach(res => {
+                let nodes = result.nodes;
+                nodes.forEach(res => {
                     res.description = res.node.description;
                     res.url = res.node.url;
                     res.isPublic = res.node.isPublic;
@@ -213,12 +211,13 @@ function processArgs() {
             let prs = new command.GetPrsCommand().execute();
 
             prs.then(result => {
-                result.nodes.forEach(res => {
+                let nodes = result.nodes;
+                nodes.forEach(res => {
                     res.authorName = res.node.author ? res.node.author.login : "none";
                     res.state = res.node.state.toLowerCase();
                     res.title = res.node.title;
                 });
-                outputResults({rowHeadings: ["title", "authorName", "state"]}, result.nodes);
+                outputResults({rowHeadings: ["title", "authorName", "state"]}, nodes);
             });
             break;
 
@@ -242,8 +241,9 @@ function processArgs() {
         case commands.rs:
             const summary = new command.GetRepositorySummaryCommand().execute();
             summary.then(data => {
-                const summaryData = data.res.data.data.repository;
-                const errors = data.res.data.errors;
+                const summaryData = data.data.data.repository;
+                const errors = data.data.errors;
+
                 if (errors) {
                     console.log(errors[0].message);
                     return;
@@ -264,12 +264,9 @@ function processArgs() {
                     if (value == null || value === '')
                         value = 'no data';
 
-                    // computed property syntax: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#Computed_property_names
                     tableRows.push({[key]: value});
                 }
-                // console.log(array);
                 outputResults({usingColumnHeadings: true}, tableRows)
-
             });
             break;
 
@@ -282,7 +279,11 @@ function processArgs() {
 }
 
 // Only process args if not required as a module
-if (require.main === module)
-    processArgs();
-
+if (require.main === module) {
+    try {
+        processArgs();
+    } catch (e) {
+        console.error(e.message);
+    }
+}
 module.exports = {outputResults, processArgs, command};
