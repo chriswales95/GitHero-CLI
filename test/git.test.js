@@ -1,32 +1,63 @@
-let Git = require('../src/lib/GitHub');
-let git = new Git(null);
+let GitHub = require('../src/lib/GitHub');
 
-it('GetRepos should fail without a token', async () => {
-    await expect(git.getRepos(1))
-        .rejects
-        .toThrow('Request failed with status code 401');
+test('performRestApiRequest should fail without token', async () => {
+    global.app = {
+        config: {}
+    }
+    try {
+        await GitHub.performRestApiRequest();
+    } catch (e) {
+        expect(e.message).toBe('Token is missing from the configuration')
+    }
 });
 
-it('GetGists should fail without a token', async () => {
-    await expect(git.getGists(1))
-        .rejects
-        .toThrow('Request failed with status code 401');
+test('performRestApiRequest should fail without a username', async () => {
+    global.app = {
+        config: {
+            token: 'some token'
+        }
+    }
+    try {
+        await GitHub.performRestApiRequest();
+    } catch (e) {
+        expect(e.message).toBe('Username is missing from the configuration')
+    }
 });
 
-it('getPullRequests should fail without a token', async () => {
-    await expect(git.getPullRequests("chrisales95", "GitHero-CLI", 1, 0))
-        .rejects
-        .toThrow('Request failed with status code 401');
+test('performRestApiRequest should fail without a URL', async () => {
+    global.app = {
+        config: {
+            token: 'some token',
+            username: 'some username'
+        }
+    }
+    try {
+        await GitHub.performRestApiRequest();
+    } catch (e) {
+        expect(e.message).toBe('No URL provided for the API request')
+    }
 });
 
-it('getIssuesFromRepo should fail without a token', async () => {
-    await expect(git.getIssuesFromRepo("chrisales95", "GitHero-CLI", 1))
-        .rejects
-        .toThrow('Request failed with status code 401');
+test('performGraphQlApiRequest should fail without a token', async () => {
+    global.app = {
+        config: {}
+    }
+    try {
+        await GitHub.performGraphQlApiRequest({});
+    } catch (e) {
+        expect(e.message).toBe('Token is missing from the configuration')
+    }
 });
 
-it('getRepositorySummary should fail if missing name option', async () => {
-    await expect(git.getRepositorySummary({name: "chrisales95"}))
-        .rejects
-        .toThrow('Missing required option: owner');
+test('performGraphQlApiRequest should fail without a username', async () => {
+    global.app = {
+        config: {
+            token: 'some token'
+        }
+    }
+    try {
+        await GitHub.performGraphQlApiRequest({});
+    } catch (e) {
+        expect(e.message).toBe('No query was provided for the API request');
+    }
 });

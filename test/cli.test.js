@@ -12,24 +12,31 @@ const data = [
     }
 ];
 
-let app = {
-    args: {
-        b: false
-    }
-};
+let {outputResults, processArgs} = require('../src');
 
-global.app = app;
-
-let {outputResults} = require('../src');
-
-test('Test cli is called', () => {
+test('Test CLI is called', () => {
 
     const testFunction = jest.fn(outputResults({rowHeadings: ["col"]}, data));
     testFunction();
     expect(testFunction).toHaveBeenCalledTimes(1);
 });
 
-test('Cli should return nothing', () => {
-    global.test = true;
+test('CLI should return nothing', () => {
+    global.app = {
+        args: {
+            b: false
+        }
+    };
     expect(outputResults({rowHeadings: ["col"]}, data)).toBeUndefined();
+});
+
+test('CLI should stop multiple commands being entered', () => {
+
+    global.app.args._ = ['rs', 'repo'];
+
+    try {
+        processArgs();
+    } catch (e) {
+        expect(e.message).toBe('Only enter one command at a time');
+    }
 });
