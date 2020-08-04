@@ -10,7 +10,8 @@ const fs = require('fs');
 class Bootstrap {
 
     /**
-     * Constructor menu
+     * Constructor for the Bootstrap class
+     *
      * @constructor
      * @param {object} args
      */
@@ -32,9 +33,9 @@ class Bootstrap {
     }
 
     /**
-     * Returns configuration storage directory
+     * Returns configuration storage destination
      *
-     * @returns {string}
+     * @returns {string} the configuration storage destination
      */
     get configurationStorage() {
         return `${os.homedir()}/.githero.json`;
@@ -43,7 +44,7 @@ class Bootstrap {
     /**
      * Return logging level
      *
-     * @returns {string}
+     * @returns {string} the logging level
      */
     get loggingLevel() {
         return this._loggingLevel;
@@ -97,7 +98,7 @@ class Bootstrap {
     /**
      * Init the app
      *
-     * @returns {Bootstrap}
+     * @returns {Bootstrap} returns an instance of the class
      */
     init() {
 

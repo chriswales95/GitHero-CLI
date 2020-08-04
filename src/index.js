@@ -18,7 +18,7 @@ yargonaut.style('cyan');
 /**
  * Key value pair for commands
  *
- * @type {Object}
+ * @type {Object} a key pair value of command names
  */
 const commands = {
     repos: "repos",
@@ -302,7 +302,7 @@ function processArgs() {
     }
 }
 
-// Only process args if not required as a module
+// Only process args if not required as a module. Will also display any errors that get raised.
 if (require.main === module) {
     try {
         processArgs();
@@ -310,4 +310,5 @@ if (require.main === module) {
         console.error(e.message);
     }
 }
+
 module.exports = {outputResults, processArgs, command};

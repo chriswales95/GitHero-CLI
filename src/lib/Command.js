@@ -36,8 +36,10 @@ class GitHubV4Command extends Command {
     static search_not_found_error = 'There was an error fetching the repository. Did you provide a valid URL?';
 
     /**
+     * Execute a GitHubV4Command command with specific handling for pagination
+     *
      * @inheritDoc
-     * @returns {Promise<null>}
+     * @returns {Promise}
      */
     async execute(command, args) {
 
