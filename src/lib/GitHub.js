@@ -6,6 +6,12 @@
  */
 class GitHub {
 
+    /**
+     * Used to perform queries against GitHub V4 API
+     *
+     * @param options {Object} an object containing a query parameter
+     * @returns {Promise}
+     */
     static async performGraphQlApiRequest(options) {
 
         if (!app.config.hasOwnProperty("token"))
@@ -23,6 +29,12 @@ class GitHub {
         }
     }
 
+    /**
+     * Used to perform queries against GitHub V3 API
+     *
+     * @param url {string} the API endpoint
+     * @returns {Promise}
+     */
     static async performRestApiRequest(url) {
 
         if (!app.config.hasOwnProperty("token"))
