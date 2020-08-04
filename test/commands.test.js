@@ -4,7 +4,8 @@ let {Command, GetReposCommand, GetIssuesCommand, GetPrsCommand, GetGistsCommand,
 
 global.app = {
     args: {
-        num: 10
+        num: 10,
+        url: 'https://github.com/chriswales95/GitHero-CLI'
     },
     config: {}
 };
