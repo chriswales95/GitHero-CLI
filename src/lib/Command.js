@@ -33,6 +33,8 @@ class Command {
  */
 class GitHubV4Command extends Command {
 
+    static search_not_found_error = 'There was an error fetching the repository. Did you provide a valid URL?';
+
     /**
      * @inheritDoc
      * @returns {Promise<null>}
@@ -121,6 +123,9 @@ class GetReposCommand extends GitHubV4Command {
                 }`
             });
 
+            if (response instanceof Error)
+                return response;
+
             return {
                 nodes: response.data.data.viewer.repositories.edges,
                 count: response.data.data.viewer.repositories.totalCount,
@@ -145,52 +150,64 @@ class GetIssuesCommand extends GitHubV4Command {
         let GitHub = require('./GitHub');
 
         return super.execute(async (options) => {
+
             let response = await GitHub.performGraphQlApiRequest({
-                query: `query 
-                {
-                repository(name: "${options.repo}", owner: "${options.owner}") {
-                    issues(first: ${options.numNeeded}, after: ${options.endCursor}) {
-                      pageInfo {
-                        endCursor
-                        hasNextPage
-                        startCursor
-                        hasPreviousPage
-                      }
-                      totalCount
+                query: `{
+                    search(query: "${new URL(options.repo).pathname}", type: REPOSITORY, first: 1) {
                       edges {
                         node {
-                          author {
-                            login
-                          }
-                          createdAt
-                          updatedAt
-                          number
-                          url
-                          title
-                          closed
-                          participants(first: 3) {
-                            nodes {
-                              email
+                          ... on Repository {
+                            issues(first: ${options.numNeeded}, after: ${options.endCursor}) {
+                              pageInfo {
+                                endCursor
+                                hasNextPage
+                                startCursor
+                                hasPreviousPage
+                              }
+                              totalCount
+                              edges {
+                                node {
+                                  author {
+                                    login
+                                  }
+                                  createdAt
+                                  updatedAt
+                                  number
+                                  url
+                                  title
+                                  closed
+                                  participants(first: 3) {
+                                    nodes {
+                                      email
+                                    }
+                                  }
+                                }
+                              }
                             }
                           }
                         }
                       }
-                    }
-                  }
-                }`
+                   }
+                 }
+               `
             });
 
+            if (response instanceof Error)
+                return response;
+
+            if (response.data.data.search.edges.length === 0)
+                return new Error(GitHubV4Command.search_not_found_error);
+
             return {
-                nodes: response.data.data.repository.issues.edges,
-                count: response.data.data.repository.issues.totalCount,
-                pageInfo: response.data.data.repository.issues.pageInfo
+                nodes: response.data.data.search.edges[0].node.issues.edges,
+                count: response.data.data.search.edges[0].node.issues.totalCount,
+                pageInfo: response.data.data.search.edges[0].node.issues.pageInfo
             }
 
         }, {
             numNeeded: app.args.num ? app.args.num : 10,
             endCursor: null,
-            repo: app.args.repository,
-            owner: app.args.account
+            repo: app.args.url,
         });
     }
 }
@@ -212,44 +229,50 @@ class GetPrsCommand extends GitHubV4Command {
 
             let response = await GitHub.performGraphQlApiRequest({
                 query: `query {
-                  repository(owner: "${options.owner}", name:"${options.repo}"){
-                    pullRequests(states: OPEN, orderBy: {field: CREATED_AT, direction: DESC} first: ${options.numNeeded}, after: ${options.endCursor}) {
-                      pageInfo {
-                        startCursor
-                        hasNextPage
-                        endCursor
-                      }
-                      totalCount
-                      edges {
-                        cursor
-                        node {
-                          updatedAt
-                          state
-                          title
-                          author {
-                            login
+                          search(query: "${new URL(options.repo).pathname}", type: REPOSITORY, first: 1) {
+                            nodes {
+                              ... on Repository {
+                                pullRequests(states: OPEN, orderBy: {field: CREATED_AT, direction: DESC}, first: ${options.numNeeded}, after: ${options.endCursor}) {
+                                  pageInfo {
+                                    startCursor
+                                    hasNextPage
+                                    endCursor
+                                  }
+                                  totalCount
+                                  edges {
+                                    cursor
+                                    node {
+                                      updatedAt
+                                      state
+                                      title
+                                      author {
+                                        login
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
                           }
-                        }
-                      }
-                    }
-                  }
-                }`
+                        }`
             });
 
-            if (response instanceof Error) {
+            if (response instanceof Error)
                 return response;
-            }
+
+
+            if (response.data.data.search.nodes.length === 0)
+                return new Error(GitHubV4Command.search_not_found_error);
 
             return {
-                nodes: response.data.data.repository.pullRequests.edges,
-                count: response.data.data.repository.pullRequests.totalCount,
-                pageInfo: response.data.data.repository.pullRequests.pageInfo
+                nodes: response.data.data.search.nodes[0].pullRequests.edges,
+                count: response.data.data.search.nodes[0].pullRequests.totalCount,
+                pageInfo: response.data.data.search.nodes[0].pullRequests.pageInfo
             }
         }, {
             numNeeded: app.args.num ? app.args.num : 10,
             endCursor: null,
-            repo: app.args.repository,
-            owner: app.args.account
+            repo: app.args.url,
         });
     }
 }
@@ -297,6 +320,9 @@ class GetGistsCommand extends GitHubV4Command {
                 }`
                 });
 
+                if (response instanceof Error)
+                    return response;
+
                 return {
                     nodes: response.data.data.viewer.gists.edges,
                     count: response.data.data.viewer.gists.totalCount,
@@ -341,48 +367,60 @@ class GetRepositorySummaryCommand extends GitHubV4Command {
 
         let GitHub = require('./GitHub');
 
-        return super.execute((options) => {
+        return super.execute(async (options) => {
 
-            return GitHub.performGraphQlApiRequest({
+            let response = await GitHub.performGraphQlApiRequest({
                 query: `query {
-                  repository(owner: "${options.owner}", name: "${options.repo}") {
-                    nameWithOwner
-                    description
-                    createdAt
-                    diskUsage
-                    homepageUrl
-                    sshUrl
-                    url
-                    stargazers {
-                      totalCount
-                    }
-                    isTemplate
-                    isPrivate
-                    isMirror
-                    isLocked
-                    isFork
-                    isArchived
-                    isDisabled
-                    hasWikiEnabled
-                    forkCount
-                    licenseInfo {
-                      nickname
-                    }
-                    hasProjectsEnabled
-                    issues(states: OPEN) {
-                      totalCount
-                    }
-                    hasIssuesEnabled
-                    id
-                    pullRequests(states: OPEN) {
-                      totalCount
-                    }
-                    pushedAt
-                    updatedAt
-                  }
-                }`
+                          search(query: "${new URL(options.repo).pathname}", type: REPOSITORY, first: 1) {
+                            nodes {
+                              ... on Repository {
+                                nameWithOwner
+                                description
+                                createdAt
+                                diskUsage
+                                homepageUrl
+                                sshUrl
+                                url
+                                stargazers {
+                                  totalCount
+                                }
+                                isTemplate
+                                isPrivate
+                                isMirror
+                                isLocked
+                                isFork
+                                isArchived
+                                isDisabled
+                                hasWikiEnabled
+                                forkCount
+                                licenseInfo {
+                                  nickname
+                                }
+                                hasProjectsEnabled
+                                issues(states: OPEN) {
+                                  totalCount
+                                }
+                                hasIssuesEnabled
+                                id
+                                pullRequests(states: OPEN) {
+                                  totalCount
+                                }
+                                pushedAt
+                                updatedAt
+                              }
+                            }
+                          }
+                        }`
             });
-        }, {owner: app.args.account, repo: app.args.repository});
+
+            if (response instanceof Error)
+                return response;
+
+            if (response.data.data.search.nodes.length === 0)
+                return new Error(GitHubV4Command.search_not_found_error);
+
+            return response;
+        }, {repo: app.args.url});
     }
 }
 

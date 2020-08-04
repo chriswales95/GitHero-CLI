@@ -126,16 +126,16 @@ let argv = yargs
     .command('repos [num]', 'get a list of your repositories', () => {
         return [yargs.option(...formatOption)]
     })
-    .command('issues <account> <repository> [num]', 'get issues from a repository', () => {
+    .command('issues <url> [num]', 'get issues from a repository', () => {
         return [yargs.option(...formatOption)]
     })
-    .command('prs <account> <repository> [num]', 'get pull requests from a repository', () => {
+    .command('prs <url> [num]', 'get pull requests from a repository', () => {
         return [yargs.option(...formatOption)]
     })
     .command('notifications', 'Display your unread notifications', () => {
         return [yargs.option(...formatOption)]
     })
-    .command('rs <account> <repository>', 'Display a summary about a repository', () => {
+    .command('rs <url>', 'Display a summary about a repository', () => {
         return [yargs.option(...formatOption)]
     })
     .help()
@@ -171,6 +171,10 @@ function processArgs() {
             let issues = new command.GetIssuesCommand().execute();
 
             issues.then(result => {
+                if (result instanceof Error) {
+                    console.error(result.message);
+                    process.exit(1);
+                }
                 result.nodes.forEach(res => {
                     res.authorName = res.node.author ? res.node.author.login : "none";
                     res.title = res.node.title;
@@ -184,6 +188,10 @@ function processArgs() {
             let repos = new command.GetReposCommand().execute();
 
             repos.then(result => {
+                if (result instanceof Error) {
+                    console.error(result.message);
+                    process.exit(1);
+                }
                 result.nodes.forEach(res => {
                     res.name = res.node.name;
                     res.sshUrl = res.node.sshUrl;
@@ -197,6 +205,10 @@ function processArgs() {
             let gists = new command.GetGistsCommand().execute();
 
             gists.then(result => {
+                if (result instanceof Error) {
+                    console.error(result.message);
+                    process.exit(1);
+                }
                 let nodes = result.nodes;
                 nodes.forEach(res => {
                     res.description = res.node.description;
@@ -211,6 +223,11 @@ function processArgs() {
             let prs = new command.GetPrsCommand().execute();
 
             prs.then(result => {
+                if (result instanceof Error) {
+                    console.error(result.message);
+                    process.exit(1);
+                }
+
                 let nodes = result.nodes;
                 nodes.forEach(res => {
                     res.authorName = res.node.author ? res.node.author.login : "none";
@@ -225,6 +242,10 @@ function processArgs() {
             let notifications = new command.GetNotificationsCommand().execute();
 
             notifications.then(result => {
+                if (result instanceof Error) {
+                    console.error(result.message);
+                    process.exit(1);
+                }
                 if (result.data.length === 0) {
                     console.log("No notifications! 🎉");
                     return;
@@ -241,12 +262,15 @@ function processArgs() {
         case commands.rs:
             const summary = new command.GetRepositorySummaryCommand().execute();
             summary.then(data => {
-                const summaryData = data.data.data.repository;
-                const errors = data.data.errors;
+                if (data instanceof Error) {
+                    console.error(data.message);
+                    process.exit(1);
+                }
+                const summaryData = data.data.data.search.nodes[0];
 
-                if (errors) {
-                    console.log(errors[0].message);
-                    return;
+                if (data.data.data.search.nodes.length === 0) {
+                    console.log('There was an error fetching the repository. Did you provide a valid URL?');
+                    process.exit(0);
                 }
 
                 let tableRows = [];
