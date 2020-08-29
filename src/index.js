@@ -178,7 +178,7 @@ function processArgs() {
                 result.nodes.forEach(res => {
                     res.authorName = res.node.author ? res.node.author.login : "none";
                     res.title = res.node.title;
-                    res.createdAt = res.node.createdAt;
+                    res.createdAt = new Date(res.node.createdAt).toUTCString();
                 });
                 outputResults({rowHeadings: ["title", "authorName", "createdAt"]}, result.nodes);
             });
@@ -195,7 +195,7 @@ function processArgs() {
                 result.nodes.forEach(res => {
                     res.name = res.node.name;
                     res.sshUrl = res.node.sshUrl;
-                    res.updatedAt = res.node.updatedAt;
+                    res.updatedAt = new Date(res.node.updatedAt).toUTCString();
                 });
                 outputResults({rowHeadings: ["name", "sshUrl", "updatedAt"]}, result.nodes);
             });
@@ -276,6 +276,17 @@ function processArgs() {
                 let tableRows = [];
                 // outputResults expects an array so let's give it one
                 for (let [key, value] of Object.entries(summaryData)) {
+
+                    if (value !== null && value instanceof String) {
+                        if (key === 'pushedAt')
+                            value = new Date(value).toUTCString();
+
+                        if (key === 'updatedAt')
+                            value = new Date(value).toUTCString();
+
+                        if (key === 'createdAt')
+                            value = new Date(value).toUTCString();
+                    }
 
                     if (typeof value === 'object' && value !== null) {
                         if (value.hasOwnProperty('totalCount'))
