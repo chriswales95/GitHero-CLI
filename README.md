@@ -1,3 +1,7 @@
+Archived in favor of the official [GitHub CLI](https://cli.github.com) 
+
+***
+
 [![forthebadge](https://forthebadge.com/images/badges/made-with-javascript.svg)](https://forthebadge.com)
 
 ![Node.js CI](https://github.com/chriswales95/GitHero-CLI/workflows/Node.js%20CI/badge.svg)
